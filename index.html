@@ -1,0 +1,4330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Quiz Application - 200 Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        /* Dark Mode - FIXED VISIBILITY ISSUES */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .header {
+            background: #2c2c54;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .quiz-section {
+            background: #2c2c54;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .controls-panel,
+        body.dark-mode .question-grid {
+            background: #2c2c54;
+            color: #e0e0e0;
+        }
+
+        /* FIXED: Dark mode title visibility */
+        body.dark-mode .title {
+            color: #e0e0e0 !important;
+        }
+
+        /* FIXED: Dark mode controls title visibility */
+        body.dark-mode .controls-title,
+        body.dark-mode .grid-title {
+            color: #e0e0e0 !important;
+        }
+
+        /* FIXED: Dark mode jump to question label visibility */
+        body.dark-mode .jump-to-question label {
+            color: #e0e0e0 !important;
+        }
+
+        /* FIXED: Dark mode question text visibility */
+        body.dark-mode .question-text {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .answer-option {
+            background: #40407a;
+            border-color: #706fd3;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .answer-option:hover:not(.disabled) {
+            background: #5352ed;
+            border-color: #3742fa;
+        }
+
+        /* FIXED: Dark mode option labels (A, B, C, D, E) visibility */
+        body.dark-mode .option-label {
+            background: #706fd3 !important;
+            color: #ffffff !important;
+        }
+
+        /* FIXED: Dark mode correct/incorrect answer visibility */
+        body.dark-mode .answer-option.correct {
+            background: #4caf50 !important;
+            color: #ffffff !important;
+            border-color: #388e3c !important;
+        }
+
+        body.dark-mode .answer-option.incorrect {
+            background: #f44336 !important;
+            color: #ffffff !important;
+            border-color: #d32f2f !important;
+        }
+
+        body.dark-mode .answer-option.correct .option-label,
+        body.dark-mode .answer-option.incorrect .option-label {
+            background: rgba(255, 255, 255, 0.3) !important;
+            color: #ffffff !important;
+        }
+
+        /* FIXED: Dark mode correct answer mode visibility */
+        body.dark-mode .answer-option.correct-answer-mode {
+            background: #4caf50 !important;
+            color: #ffffff !important;
+            border: 2px solid #388e3c !important;
+            font-weight: 600;
+        }
+
+        body.dark-mode .answer-option.other-answer-mode {
+            background: #40407a !important;
+            color: #b0b0b0 !important;
+            border: 1px solid #706fd3 !important;
+            opacity: 0.7;
+        }
+
+        body.dark-mode .grid-item {
+            background: #40407a;
+            border-color: #706fd3;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .grid-item:hover {
+            background: #5352ed;
+            border-color: #3742fa;
+        }
+
+        /* Exam Mode Body Styles */
+        body.exam-mode {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        body.exam-mode.dark-mode {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Container */
+        body.exam-mode .container {
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Header */
+        body.exam-mode .header {
+            background: #e8e8e8;
+            border-radius: 0;
+            margin-bottom: 0;
+            padding: 15px 20px;
+            box-shadow: none;
+            border-bottom: 1px solid #ddd;
+        }
+
+        body.exam-mode.dark-mode .header {
+            background: #2c2c54;
+            border-bottom: 1px solid #40407a;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Title */
+        body.exam-mode .title {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        body.exam-mode.dark-mode .title {
+            color: #e0e0e0;
+        }
+
+        .timer-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Timer Section */
+        body.exam-mode .timer-section {
+            gap: 20px;
+        }
+
+        .timer-settings {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .timer-settings.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Exam Mode Timer Settings - Show in exam mode */
+        body.exam-mode .timer-settings {
+            display: flex;
+        }
+
+        /* NEW: Question Shuffle Settings for Exam Mode */
+        .question-shuffle-settings {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: #fff3e0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 2px solid #ff9800;
+            transition: all 0.3s ease;
+        }
+
+        .question-shuffle-settings.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Show question shuffle settings only in exam mode */
+        body.exam-mode .question-shuffle-settings {
+            display: flex;
+        }
+
+        .question-count-settings {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: #e3f2fd;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 2px solid #2196f3;
+            transition: all 0.3s ease;
+        }
+
+        .question-count-settings.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Show question count settings only in exam mode */
+        body.exam-mode .question-count-settings {
+            display: flex;
+        }
+
+        .timer-input, .count-input {
+            width: 60px;
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .timer-label, .count-label, .shuffle-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .timer-start-btn, .count-reset-btn, .shuffle-toggle-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .timer-start-btn:hover, .count-reset-btn:hover, .shuffle-toggle-btn:hover {
+            background: #218838;
+        }
+
+        .count-reset-btn {
+            background: #2196f3;
+        }
+
+        .count-reset-btn:hover {
+            background: #1976d2;
+        }
+
+        .shuffle-toggle-btn {
+            background: #ff9800;
+        }
+
+        .shuffle-toggle-btn:hover {
+            background: #f57c00;
+        }
+
+        .shuffle-toggle-btn.active {
+            background: #4caf50;
+        }
+
+        .shuffle-toggle-btn.active:hover {
+            background: #388e3c;
+        }
+
+        .timer {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 25px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d32f2f;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Timer */
+        body.exam-mode .timer {
+            background: #ffcdd2;
+            border: 1px solid #f44336;
+            border-radius: 8px;
+            padding: 8px 15px;
+            color: #d32f2f;
+            font-size: 14px;
+        }
+
+        .timer.active {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        /* Exam Mode Active Timer */
+        body.exam-mode .timer.active {
+            background: #ffcdd2;
+            border-color: #f44336;
+            color: #d32f2f;
+        }
+
+        /* NEW: Question Shuffle Display */
+        .question-shuffle-display {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            border-radius: 8px;
+            padding: 8px 15px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #e65100;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        body.exam-mode .question-shuffle-display {
+            display: flex;
+        }
+
+        .question-shuffle-display.active {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        /* NEW: Question Count Display */
+        .question-count-display {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 8px 15px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #1565c0;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        body.exam-mode .question-count-display {
+            display: flex;
+        }
+
+        .timer-reset-btn, .shuffle-reset-btn, .count-reset-display-btn {
+            background: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .timer-reset-btn.visible,
+        .shuffle-reset-btn.visible,
+        .count-reset-display-btn.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .timer-reset-btn:hover,
+        .shuffle-reset-btn:hover,
+        .count-reset-display-btn:hover {
+            background: #e64a19;
+        }
+
+        .count-reset-display-btn {
+            background: #2196f3;
+        }
+
+        .count-reset-display-btn:hover {
+            background: #1976d2;
+        }
+
+        .timer-expired-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .timer-expired-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .timer-expired-message {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .result-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .result-message {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .result-message.passed {
+            border-left: 5px solid #4caf50;
+        }
+
+        .result-message.failed {
+            border-left: 5px solid #f44336;
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .result-title.passed {
+            color: #4caf50;
+        }
+
+        .result-title.failed {
+            color: #f44336;
+        }
+
+        .result-stats {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .exit-btn {
+            background: #37474f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .exit-btn:hover {
+            background: #455a64;
+        }
+
+        /* Exam Mode Exit Button */
+        body.exam-mode .exit-btn {
+            background: #2c3e50;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Main Content */
+        body.exam-mode .main-content {
+            grid-template-columns: 1fr;
+            gap: 0;
+            background: #f5f5f5;
+        }
+
+        body.exam-mode.dark-mode .main-content {
+            background: #1a1a2e;
+        }
+
+        .quiz-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease, all 0.3s ease;
+        }
+
+        /* Exam Mode Quiz Section */
+        body.exam-mode .quiz-section {
+            background: #f5f5f5;
+            border-radius: 0;
+            padding: 20px;
+            box-shadow: none;
+            margin-bottom: 0;
+        }
+
+        body.exam-mode.dark-mode .quiz-section {
+            background: #1a1a2e;
+        }
+
+        .quiz-section.timer-expired {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .question-header {
+            background: #3f51b5;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Question Header */
+        body.exam-mode .question-header {
+            background: #0D0A69;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            justify-content: space-between;
+        }
+
+        .question-number {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Question Number */
+        body.exam-mode .question-number {
+            background: #34495e;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 14px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .question-counter {
+            background: #4caf50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* Exam Mode Question Counter */
+        body.exam-mode .question-counter {
+            display: inline-block;
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Exam Mode Question Text - NO OVERLAPPING NUMBER */
+        body.exam-mode .question-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        body.exam-mode.dark-mode .question-text {
+            color: #e0e0e0;
+        }
+
+        .answers {
+            space-y: 12px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Exam Mode Answer Options */
+        body.exam-mode .answer-option {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 0;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        body.exam-mode.dark-mode .answer-option {
+            background: #40407a;
+            border-color: #706fd3;
+            color: #e0e0e0;
+        }
+
+        .answer-option:hover:not(.disabled) {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: translateY(-2px);
+        }
+
+        /* Exam Mode Answer Option Hover */
+        body.exam-mode .answer-option:hover:not(.disabled) {
+            background: #e8f4fd;
+            border-color: #2196f3;
+            transform: none;
+        }
+
+        body.exam-mode.dark-mode .answer-option:hover:not(.disabled) {
+            background: #5352ed;
+            border-color: #3742fa;
+        }
+
+        .answer-option.selected {
+            background: #2196f3;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        /* Exam Mode Selected Answer */
+        body.exam-mode .answer-option.selected {
+            background: #2196f3;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        .answer-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #388e3c;
+        }
+
+        .answer-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #d32f2f;
+        }
+
+        .answer-option.correct-answer-mode {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+            font-weight: 600;
+        }
+
+        .answer-option.other-answer-mode {
+            background: #f5f5f5;
+            color: #757575;
+            border: 1px solid #e0e0e0;
+            opacity: 0.7;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+        }
+
+        .answer-option.timer-expired {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .option-label {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        /* Exam Mode Option Label */
+        body.exam-mode .option-label {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            background: white;
+            font-size: 0;
+            position: relative;
+        }
+
+        body.exam-mode .answer-option.selected .option-label {
+            background: #2196f3;
+            border-color: #2196f3;
+        }
+
+        body.exam-mode .answer-option.selected .option-label::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .answer-option.selected .option-label,
+        .answer-option.correct .option-label,
+        .answer-option.incorrect .option-label {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Navigation */
+        body.exam-mode .navigation {
+            justify-content: flex-start;
+            gap: 15px;
+            border-top: none;
+            margin-top: 20px;
+            padding-top: 0;
+        }
+
+        .nav-btn {
+            background: #3f51b5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        /* Exam Mode Navigation Buttons */
+        body.exam-mode .nav-btn {
+            background: #2196f3;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover {
+            background: #303f9f;
+        }
+
+        body.exam-mode .nav-btn:hover {
+            background: #1976d2;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Exam Mode Sidebar - HIDE IN EXAM MODE */
+        body.exam-mode .sidebar {
+            display: none;
+        }
+
+        .controls-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .mode-toggles {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .toggle-btn:hover {
+            background: #e9ecef;
+        }
+
+        .toggle-btn.active {
+            background: #3f51b5;
+            color: white;
+            border-color: #3f51b5;
+        }
+
+        .jump-to-question {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .jump-to-question label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .jump-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .jump-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .jump-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .jump-btn:hover {
+            background: #1976d2;
+        }
+
+        .question-grid {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .grid-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+        }
+
+        .grid-item {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .grid-item:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .grid-item.current {
+            background: #3f51b5;
+            color: white;
+            border-color: #3f51b5;
+        }
+
+        .grid-item.answered {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+        
+        /* NEW: Correct answer in grid (Green) */
+        .grid-item.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+        
+        /* NEW: Incorrect answer in grid (Red) */
+        .grid-item.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .grid-item.unanswered {
+            background: #ff9800;
+            color: white;
+            border-color: #ff9800;
+        }
+
+        /* FIXED: SINGLE Exam Mode Question Grid - Navy Blue Header and White Background */
+        .exam-question-grid {
+            display: none;
+            margin-top: 20px;
+        }
+
+        body.exam-mode .exam-question-grid {
+            display: block;
+        }
+
+        .exam-grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #0D0A69;
+            padding: 10px 15px;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .exam-grid-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .exam-grid-toggle {
+            background: #34495e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .exam-grid-toggle:hover {
+            background: #4a6741;
+        }
+
+        /* FIXED: White background for exam grid container */
+        .exam-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            background: white;
+            padding: 15px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .exam-grid-container.collapsed {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            padding: 0;
+        }
+
+        /* FIXED: Exam Grid Items - Red color like reference image */
+        .exam-grid-item {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #c0392b;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 11px;
+            transition: all 0.3s;
+            background: #e74c3c;
+            color: white;
+        }
+
+        .exam-grid-item:hover {
+            background: #c0392b;
+        }
+
+        .exam-grid-item.current {
+            background: #3498db;
+            border-color: #2980b9;
+        }
+
+        /* Answered questions - Red background like in reference */
+        .exam-grid-item.answered {
+            background: #e74c3c;
+            border-color: #c0392b;
+        }
+
+        /* Unanswered questions - Red background like in reference */
+        .exam-grid-item.unanswered {
+            background: #e74c3c;
+            border-color: #c0392b;
+        }
+
+        /* FIXED: Hide mobile question dropdown in exam mode */
+        .mobile-question-dropdown {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        /* FIXED: Hide mobile dropdown in exam mode */
+        body.exam-mode .mobile-question-dropdown {
+            display: none !important;
+        }
+
+        .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .dropdown-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .dropdown-arrow {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-arrow.expanded {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .dropdown-content.expanded {
+            max-height: 300px;
+            overflow-y: auto; /* Added scroll functionality */
+            padding-bottom: 10px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .timer-section {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .quiz-section {
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .answer-option {
+                padding: 12px 15px;
+                gap: 10px;
+            }
+
+            .option-label {
+                width: 25px;
+                height: 25px;
+                font-size: 12px;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                width: 100%;
+                padding: 12px;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .controls-panel,
+            .question-grid {
+                padding: 15px;
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+                gap: 6px;
+            }
+
+            .grid-item {
+                width: 35px;
+                height: 35px;
+                font-size: 11px;
+            }
+
+            /* Show mobile dropdown instead of sidebar grid in NON-EXAM mode only */
+            .question-grid {
+                display: none;
+            }
+
+            .mobile-question-dropdown {
+                display: block;
+            }
+
+            /* FIXED: Hide mobile dropdown in exam mode on mobile too */
+            body.exam-mode .mobile-question-dropdown {
+                display: none !important;
+            }
+
+            /* Exam Mode Mobile Adjustments */
+            body.exam-mode .container {
+                padding: 0;
+            }
+
+            body.exam-mode .header {
+                padding: 10px 15px;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            body.exam-mode .timer-section {
+                gap: 10px;
+            }
+
+            body.exam-mode .quiz-section {
+                padding: 15px;
+            }
+
+            body.exam-mode .question-text {
+                font-size: 14px;
+                margin-bottom: 15px;
+            }
+
+            body.exam-mode .answer-option {
+                padding: 10px 12px;
+                margin-bottom: 6px;
+            }
+
+            body.exam-mode .option-label {
+                width: 18px;
+                height: 18px;
+            }
+
+            body.exam-mode .navigation {
+                flex-direction: row;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            body.exam-mode .nav-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+                width: auto;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 18px;
+            }
+
+            body.exam-mode .title {
+                font-size: 14px;
+            }
+
+            .timer-input, .count-input {
+                width: 50px;
+                font-size: 12px;
+            }
+
+            .timer {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            body.exam-mode .timer {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .question-text {
+                font-size: 14px;
+            }
+
+            body.exam-mode .question-text {
+                font-size: 13px;
+            }
+
+            .answer-option {
+                padding: 10px 12px;
+            }
+
+            body.exam-mode .answer-option {
+                padding: 8px 10px;
+            }
+
+            .option-text {
+                font-size: 14px;
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+                gap: 4px;
+            }
+
+            .grid-item {
+                width: 30px;
+                height: 30px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Enhanced Quiz Application</div>
+            <div class="timer-section">
+                <div class="timer-settings">
+                    <span class="timer-label">Minutes:</span>
+                    <input type="number" class="timer-input" id="minutesInput" value="30" min="1" max="180">
+                    <span class="timer-label">Seconds:</span>
+                    <input type="number" class="timer-input" id="secondsInput" value="0" min="0" max="59">
+                    <button class="timer-start-btn" onclick="startTimer()">Start</button>
+                </div>
+                
+                <div class="question-shuffle-settings">
+                    <span class="shuffle-label">🔀 Shuffle Questions:</span>
+                    <button class="shuffle-toggle-btn" id="shuffleToggleBtn" onclick="toggleQuestionShuffle()">Enable</button>
+                </div>
+                
+                <div class="question-count-settings">
+                    <span class="count-label">Questions:</span>
+                    <input type="number" class="count-input" id="questionCountInput" value="200" min="1" max="200">
+                    <span class="count-label">/ 200</span>
+                    <button class="count-reset-btn" onclick="setQuestionCount()">Set</button>
+                </div>
+                
+                <div class="timer" id="timer">
+                    <span>⏰</span>
+                    <span id="timerDisplay">No timer set</span>
+                    <button class="timer-reset-btn" id="timerResetBtn" onclick="resetTimer()">Reset</button>
+                </div>
+                
+                <div class="question-shuffle-display" id="questionShuffleDisplay">
+                    <span>🔀</span>
+                    <span id="shuffleDisplayText">Shuffle: Off</span>
+                    <button class="shuffle-reset-btn" id="shuffleResetBtn" onclick="resetQuestionShuffle()">Reset</button>
+                </div>
+                
+                <div class="question-count-display" id="questionCountDisplay">
+                    <span>📊</span>
+                    <span id="countDisplayText">200 / 200</span>
+                    <button class="count-reset-display-btn" id="countResetDisplayBtn" onclick="resetQuestionCount()">Reset</button>
+                </div>
+                
+                <button class="exit-btn" onclick="exitQuiz()">
+                    <span>🚪</span>
+                    <span id="exitBtnText">Exit</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="quiz-section" id="quizSection">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Question 1</div>
+                    <div class="question-counter" id="questionCounter">1 / 200</div>
+                </div>
+                
+                <div class="question-text" id="questionText">
+                    Loading question...
+                </div>
+                
+                <div class="answers" id="answersContainer">
+                    </div>
+                
+                <div class="navigation">
+                    <button class="nav-btn" id="prevBtn" onclick="previousQuestion()" disabled>Previous</button>
+                    <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+                    <button class="nav-btn" id="finishBtn" onclick="finishQuiz()" style="display: none;">Finish</button>
+                    <button class="nav-btn" id="submitBtn" onclick="finishQuiz()" style="display: none;">Submit</button>
+                </div>
+
+                <div class="mobile-question-dropdown" id="mobileQuestionDropdown">
+                    <div class="dropdown-header" onclick="toggleMobileDropdown()">
+                        <div class="dropdown-title">Question Navigator</div>
+                        <div class="dropdown-arrow" id="dropdownArrow">▼</div>
+                    </div>
+                    <div class="dropdown-content" id="dropdownContent">
+                        <div class="grid-container" id="mobileQuestionGrid">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="exam-question-grid" id="examQuestionGrid">
+                    <div class="exam-grid-header">
+                        <div class="exam-grid-title">Question Navigator</div>
+                        <button class="exam-grid-toggle" id="examGridToggle" onclick="toggleExamGrid()">Collapse</button>
+                    </div>
+                    <div class="exam-grid-container" id="examGridContainer">
+                        </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="controls-panel">
+                    <div class="controls-title">Quiz Controls</div>
+                    <div class="mode-toggles">
+                        <button class="toggle-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+                        <button class="toggle-btn" id="answerModeBtn" onclick="toggleAnswerMode()">💡 Answer Mode</button>
+                        <button class="toggle-btn" id="questionShuffleModeBtn" onclick="toggleQuestionShuffleMode()">🔀 Shuffle Questions</button>
+                        <button class="toggle-btn" id="examModeBtn" onclick="toggleExamMode()">🎓 Simulate Exam Mode</button>
+                    </div>
+                    <div class="jump-to-question">
+                        <label for="jumpInput">Jump to Question:</label>
+                        <div class="jump-input-group">
+                            <input type="number" class="jump-input" id="jumpInput" min="1" max="200" placeholder="Enter question number">
+                            <button class="jump-btn" onclick="jumpToQuestionNumber()">Go</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-grid">
+                    <div class="grid-title">Question Navigator</div>
+                    <div class="grid-container" id="questionGrid">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="timer-expired-overlay" id="timerExpiredOverlay">
+        <div class="timer-expired-message">
+            <h2>⏰ Time's Up!</h2>
+            <p>The timer has expired. Your quiz has been automatically submitted.</p>
+            <button class="nav-btn" onclick="hideTimerExpiredOverlay()">Continue</button>
+        </div>
+    </div>
+
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-message" id="resultMessage">
+            <div class="result-title" id="resultTitle">Quiz Completed!</div>
+            <div class="result-stats" id="resultStats">
+                </div>
+            <button class="nav-btn" onclick="hideResultOverlay()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Quiz data
+        const questions = [
+        {
+            question: "What is the first-line medical agent used for first-trimester medical abortion?",
+            answers: [
+                { text: "Mifepristone + Misoprostol", correct: true },
+                { text: "Methotrexate", correct: false },
+                { text: "Oxytocin", correct: false },
+                { text: "Dinoprostone", correct: false },
+                { text: "Estrogen", correct: false },
+            ]
+        },
+        {
+            question: "Up to how many weeks of gestation is medical termination of pregnancy most commonly performed?",
+            answers: [
+                { text: "10 weeks", correct: true },
+                { text: "16 weeks", correct: false },
+                { text: "20 weeks", correct: false },
+                { text: "24 weeks", correct: false },
+                { text: "28 weeks", correct: false },
+            ]
+        },
+        {
+            question: "Which drug is a progesterone receptor modulator used in medical abortion?",
+            answers: [
+                { text: "Mifepristone", correct: true },
+                { text: "Misoprostol", correct: false },
+                { text: "Methotrexate", correct: false },
+                { text: "Oxytocin", correct: false },
+                { text: "Prostaglandin E2", correct: false },
+            ]
+        },
+        {
+            question: "What is a common side effect of misoprostol?",
+            answers: [
+                { text: "Nausea and diarrhea", correct: true },
+                { text: "Hypertension", correct: false },
+                { text: "Tachycardia", correct: false },
+                { text: "Hyperglycemia", correct: false },
+                { text: "Rash", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old woman with a 7-week intrauterine pregnancy and a history of two previous cesarean sections requests medical abortion. What is the most important consideration?",
+            answers: [
+                { text: "Risk of uterine rupture", correct: true },
+                { text: "Risk of infection", correct: false },
+                { text: "Risk of ectopic pregnancy", correct: false },
+                { text: "Risk of thromboembolism", correct: false },
+                { text: "Risk of ovarian hyperstimulation", correct: false },
+            ]
+        },
+        {
+            question: "A patient has Rh-negative blood type and undergoes medical abortion at 9 weeks. What management is essential?",
+            answers: [
+                { text: "Administer Anti-D immunoglobulin", correct: true },
+                { text: "No additional management needed", correct: false },
+                { text: "Perform blood transfusion", correct: false },
+                { text: "Administer IV iron", correct: false },
+                { text: "Schedule hysterectomy", correct: false },
+            ]
+        },
+        {
+            question: "A woman reports severe abdominal pain and fever 3 days after medical abortion. What is the most likely diagnosis?",
+            answers: [
+                { text: "Endometritis", correct: true },
+                { text: "Normal cramping", correct: false },
+                { text: "Ovarian cyst rupture", correct: false },
+                { text: "Urinary tract infection", correct: false },
+                { text: "Gastroenteritis", correct: false },
+            ]
+        },
+        {
+            question: "A patient with a history of adrenal insufficiency is scheduled for medical abortion. Which drug requires special consideration?",
+            answers: [
+                { text: "Mifepristone", correct: true },
+                { text: "Misoprostol", correct: false },
+                { text: "Ibuprofen", correct: false },
+                { text: "Acetaminophen", correct: false },
+                { text: "Doxycycline", correct: false },
+            ]
+        },
+        {
+            question: "A woman fails medical abortion at 8 weeks. What is the next appropriate step?",
+            answers: [
+                { text: "Surgical evacuation (e.g., vacuum aspiration)", correct: true },
+                { text: "Repeat the same medical regimen", correct: false },
+                { text: "Wait for another week", correct: false },
+                { text: "Start chemotherapy", correct: false },
+                { text: "Perform hysterectomy", correct: false },
+            ]
+        },
+        {
+            question: "What is the first-line medical agent used for termination of pregnancy in the first trimester?",
+            answers: [
+                { text: "Mifepristone", correct: true },
+                { text: "Misoprostol", correct: false },
+                { text: "Oxytocin", correct: false },
+                { text: "Methotrexate", correct: false },
+                { text: "Dinoprostone", correct: false },
+            ]
+        },
+        {
+            question: "Up to how many weeks of gestation is medical termination of pregnancy generally considered safe and effective?",
+            answers: [
+                { text: "10 weeks", correct: true },
+                { text: "12 weeks", correct: false },
+                { text: "14 weeks", correct: false },
+                { text: "16 weeks", correct: false },
+                { text: "20 weeks", correct: false },
+            ]
+        },
+        {
+            question: "Which drug is typically administered 24-48 hours after Mifepristone to induce uterine contractions?",
+            answers: [
+                { text: "Misoprostol", correct: true },
+                { text: "Methotrexate", correct: false },
+                { text: "Estrogen", correct: false },
+                { text: "Progesterone", correct: false },
+                { text: "Cabergoline", correct: false },
+            ]
+        },
+        {
+            question: "A patient at 8 weeks gestation, with a known copper IUD in place, requests medical termination. The most appropriate initial action is:",
+            answers: [
+                { text: "Remove the IUD before administering Mifepristone", correct: true },
+                { text: "Proceed with the standard regimen with the IUD in situ", correct: false },
+                { text: "Double the dose of Misoprostol", correct: false },
+                { text: "Schedule for immediate surgical termination", correct: false },
+                { text: "Prescribe antibiotics for one week first", correct: false },
+            ]
+        },
+        {
+            question: "A patient develops a fever of 38.5 C and severe abdominal pain 12 hours after using Misoprostol. The most likely diagnosis is:",
+            answers: [
+                { text: "Infection (septic abortion)", correct: true },
+                { text: "Normal side effects of Misoprostol", correct: false },
+                { text: "Ovarian torsion", correct: false },
+                { text: "Appendicitis", correct: false },
+                { text: "Nephrolithiasis", correct: false },
+            ]
+        },
+        {
+            question: "A patient with a stable, small uterine fibroid (3cm) desires medical termination. Your management is:",
+            answers: [
+                { text: "Proceed with standard medical regimen if no other contraindications", correct: true },
+                { text: "Contraindication; recommend surgery only", correct: false },
+                { text: "Require a myomectomy first", correct: false },
+                { text: "Use a higher dose of Mifepristone", correct: false },
+                { text: "Avoid Misoprostol and use Methotrexate instead", correct: false },
+            ]
+        },
+        {
+            question: "A patient has failed medical termination (persistent gestational sac on US). The next step is:",
+            answers: [
+                { text: "Offer surgical evacuation (e.g., suction curettage)", correct: true },
+                { text: "Repeat the same medical regimen", correct: false },
+                { text: "Switch to a different prostaglandin", correct: false },
+                { text: "Administer high-dose estrogen", correct: false },
+                { text: "Admit for observation", correct: false },
+            ]
+        },
+        {
+            question: "A patient who is breastfeeding requests medical termination. The correct advice is:",
+            answers: [
+                { text: "Medical termination is safe; advise expressing and discarding breast milk for 5 days after Misoprostol", correct: true },
+                { text: "It is absolutely contraindicated", correct: false },
+                { text: "She must stop breastfeeding for one month", correct: false },
+                { text: "Only surgical termination is possible", correct: false },
+                { text: "Mifepristone passes into milk and is toxic to the infant", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old woman is at 7 weeks gestation. She has no contraindications and opts for medical termination. Which regimen is most appropriate?",
+            answers: [
+                { text: "Mifepristone 200mg orally followed by Misoprostol 800mcg buccally", correct: true },
+                { text: "Misoprostol alone, 400mcg every 2 hours", correct: false },
+                { text: "Methotrexate IM followed by Misoprostol", correct: false },
+                { text: "Oxytocin IV infusion", correct: false },
+                { text: "Estrogen and Progesterone combination", correct: false },
+            ]
+        },
+        {
+            question: "A patient presents with heavy bleeding and abdominal pain 5 days after taking medication for termination. What is the most likely complication?",
+            answers: [
+                { text: "Incomplete abortion", correct: true },
+                { text: "Ectopic pregnancy rupture", correct: false },
+                { text: "Ovarian hyperstimulation", correct: false },
+                { text: "Pelvic inflammatory disease", correct: false },
+                { text: "Urinary tract infection", correct: false },
+            ]
+        },
+        {
+            question: "What is the most critical step before initiating medical termination?",
+            answers: [
+                { text: "Confirming an intrauterine pregnancy", correct: true },
+                { text: "Checking blood glucose", correct: false },
+                { text: "Performing a Pap smear", correct: false },
+                { text: "Testing for BRCA mutations", correct: false },
+                { text: "Measuring fundal height", correct: false },
+            ]
+        },
+        {
+            question: "Which contraceptive method is considered the most effective for preventing pregnancy?",
+            answers: [
+                { text: "Intrauterine device (IUD)", correct: true },
+                { text: "Combined oral contraceptive pill", correct: false },
+                { text: "Male condom", correct: false },
+                { text: "Fertility awareness methods", correct: false },
+                { text: "Withdrawal", correct: false },
+            ]
+        },
+        {
+            question: "The primary mechanism of action of combined oral contraceptive pills is:",
+            answers: [
+                { text: "Inhibition of ovulation", correct: true },
+                { text: "Thickening of cervical mucus", correct: false },
+                { text: "Prevention of implantation", correct: false },
+                { text: "Creating a hostile uterine environment", correct: false },
+                { text: "Tubal occlusion", correct: false },
+            ]
+        },
+        {
+            question: "A non-hormonal, long-acting reversible contraceptive method is:",
+            answers: [
+                { text: "Copper IUD", correct: true },
+                { text: "Etonogestrel implant", correct: false },
+                { text: "Depot medroxyprogesterone acetate injection", correct: false },
+                { text: "Levonorgestrel IUD", correct: false },
+                { text: "Vaginal ring", correct: false },
+            ]
+        },
+        {
+            question: "Which is a common, non-serious side effect of progestin-only contraceptives?",
+            answers: [
+                { text: "Irregular menstrual bleeding", correct: true },
+                { text: "Thromboembolism", correct: false },
+                { text: "Myocardial infarction", correct: false },
+                { text: "Hypertension", correct: false },
+                { text: "Liver tumors", correct: false },
+            ]
+        },
+        {
+            question: "A 30-year-old smoker (15 cigarettes/day) requests oral contraception. The most appropriate advice is:",
+            answers: [
+                { text: "Combined pills are contraindicated; offer a progestin-only method", correct: true },
+                { text: "Prescribe a low-dose combined pill", correct: false },
+                { text: "Recommend she stop smoking and use the patch", correct: false },
+                { text: "The risk is negligible; any pill is fine", correct: false },
+                { text: "She is only eligible for barrier methods", correct: false },
+            ]
+        },
+        {
+            question: "A woman with a history of deep vein thrombosis (DVT) wants effective contraception. Which method is safest?",
+            answers: [
+                { text: "Progestin-only pill or implant", correct: true },
+                { text: "Combined oral contraceptive pill", correct: false },
+                { text: "Contraceptive vaginal ring", correct: false },
+                { text: "Transdermal patch", correct: false },
+                { text: "Combined injectable contraceptive", correct: false },
+            ]
+        },
+        {
+            question: "A patient complains of heavy menstrual bleeding and dysmenorrhea. She desires contraception. The best choice is:",
+            answers: [
+                { text: "Levonorgestrel-releasing IUS (Mirena)", correct: true },
+                { text: "Copper IUD", correct: false },
+                { text: "Progestin-only pill", correct: false },
+                { text: "Diaphragm", correct: false },
+                { text: "Fertility awareness", correct: false },
+            ]
+        },
+        {
+            question: "A woman who is 6 weeks postpartum and exclusively breastfeeding asks about contraception. A suitable option is:",
+            answers: [
+                { text: "Progestin-only pill (POP)", correct: true },
+                { text: "Combined oral contraceptive pill", correct: false },
+                { text: "Contraceptive vaginal ring", correct: false },
+                { text: "Any method is acceptable", correct: false },
+                { text: "She does not need contraception while breastfeeding", correct: false },
+            ]
+        },
+        {
+            question: "A patient with poorly controlled hypertension is seeking a reliable contraceptive method. Which method is preferred?",
+            answers: [
+                { text: "Levonorgestrel IUD", correct: true },
+                { text: "Combined oral contraceptive pill", correct: false },
+                { text: "Transdermal patch", correct: false },
+                { text: "Vaginal ring", correct: false },
+                { text: "Combined injectable", correct: false },
+            ]
+        },
+        {
+            question: "A woman with migraine with aura should avoid:",
+            answers: [
+                { text: "Combined hormonal contraceptives", correct: true },
+                { text: "Progestin-only pills", correct: false },
+                { text: "Copper IUD", correct: false },
+                { text: "Barrier methods", correct: false },
+                { text: "Fertility awareness", correct: false },
+            ]
+        },
+        {
+            question: "The most common reason for combined oral contraceptive pill failure is:",
+            answers: [
+                { text: "Incorrect or inconsistent use", correct: true },
+                { text: "Drug interactions", correct: false },
+                { text: "Vomiting or diarrhea", correct: false },
+                { text: "Manufacturing defects", correct: false },
+                { text: "Genetic factors", correct: false },
+            ]
+        },
+        {
+            question: "A patient using DMPA (Depo-Provera) injection should be informed about:",
+            answers: [
+                { text: "Potential for weight gain and delayed return of fertility", correct: true },
+                { text: "Immediate fertility after discontinuation", correct: false },
+                { text: "Increased risk of osteoporosis in young women", correct: false },
+                { text: "Guaranteed regular cycles", correct: false },
+                { text: "Protection against STIs", correct: false },
+            ]
+        },
+        {
+            question: "A 22-year-old nulliparous woman with no medical problems presents, concerned about STIs and desiring highly effective contraception. The best recommendation is:",
+            answers: [
+                { text: "Consistent male condom use + Long-acting reversible contraceptive (LARC)", correct: true },
+                { text: "Copper IUD alone", correct: false },
+                { text: "Fertility awareness method", correct: false },
+                { text: "Withdrawal method", correct: false },
+                { text: "Diaphragm alone", correct: false },
+            ]
+        },
+        {
+            question: "A patient using a combined oral contraceptive pill misses 2 active pills in a row during the third week of the pack. What is the correct advice?",
+            answers: [
+                { text: "Take the two missed pills immediately, continue the pack, and use backup contraception for 7 days", correct: true },
+                { text: "Discard the pack and start a new one immediately", correct: false },
+                { text: "Take one missed pill and continue as normal", correct: false },
+                { text: "Stop taking pills and use condoms for the rest of the cycle", correct: false },
+                { text: "Double the next 7 doses", correct: false },
+            ]
+        },
+        {
+            question: "A woman with a BMI of 38 requests emergency contraception. The most effective option for her is:",
+            answers: [
+                { text: "Copper IUD insertion", correct: true },
+                { text: "Double dose of Levonorgestrel EC", correct: false },
+                { text: "Single dose of Ulipristal acetate", correct: false },
+                { text: "Using two vaginal rings", correct: false },
+                { text: "A high-dose progestin pill", correct: false },
+            ]
+        },
+        {
+            question: "A patient with a history of breast cancer (estrogen receptor-positive, completed treatment 2 years ago) requests contraception. The most appropriate method is:",
+            answers: [
+                { text: "Copper IUD", correct: true },
+                { text: "Combined hormonal patch", correct: false },
+                { text: "Any combined oral contraceptive", correct: false },
+                { text: "Vaginal ring", correct: false },
+                { text: "Levonorgestrel IUD", correct: false },
+            ]
+        },
+        {
+            question: "A patient with a seizure disorder on carbamazepine desires oral contraception. The most appropriate management is:",
+            answers: [
+                { text: "Use a non-hormonal method or a higher-dose COCP; efficacy of standard pills may be reduced", correct: true },
+                { text: "Prescribe a standard low-dose COCP", correct: false },
+                { text: "Recommend a progestin-only pill at the standard dose", correct: false },
+                { text: "Contraindicate all hormonal methods", correct: false },
+                { text: "Advise her that her antiepileptics will protect her from pregnancy", correct: false },
+            ]
+        },
+        {
+            question: "A woman develops hypertension while on combined oral contraceptive pills. The first step is:",
+            answers: [
+                { text: "Discontinue COCs and evaluate blood pressure", correct: true },
+                { text: "Add antihypertensive medication", correct: false },
+                { text: "Switch to a different COC brand", correct: false },
+                { text: "Continue COCs and monitor", correct: false },
+                { text: "Reduce the dose of COCs", correct: false },
+            ]
+        },
+        {
+            question: "A patient with systemic lupus erythematosus (SLE) with positive antiphospholipid antibodies should avoid:",
+            answers: [
+                { text: "Combined hormonal contraceptives", correct: true },
+                { text: "Copper IUD", correct: false },
+                { text: "Progestin-only pills", correct: false },
+                { text: "Barrier methods", correct: false },
+                { text: "Fertility awareness", correct: false },
+            ]
+        },
+        {
+            question: "The recommended time for postpartum IUD insertion is:",
+            answers: [
+                { text: "Immediately after delivery (within 10 minutes)", correct: true },
+                { text: "At 6 weeks postpartum", correct: false },
+                { text: "At 3 months postpartum", correct: false },
+                { text: "During the first menstrual period", correct: false },
+                { text: "Only after stopping breastfeeding", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common cause of vaginal discharge with a \"fishy\" odor?",
+            answers: [
+                { text: "Bacterial vaginosis", correct: true },
+                { text: "Candidiasis", correct: false },
+                { text: "Trichomoniasis", correct: false },
+                { text: "Gonorrhea", correct: false },
+                { text: "Chlamydia", correct: false },
+            ]
+        },
+        {
+            question: "Which organism is most commonly associated with vulvovaginal candidiasis?",
+            answers: [
+                { text: "Candida albicans", correct: true },
+                { text: "Trichomonas vaginalis", correct: false },
+                { text: "Gardnerella vaginalis", correct: false },
+                { text: "Neisseria gonorrhoeae", correct: false },
+                { text: "Chlamydia trachomatis", correct: false },
+            ]
+        },
+        {
+            question: "What is the typical appearance of discharge in trichomoniasis?",
+            answers: [
+                { text: "Frothy, yellow-green", correct: true },
+                { text: "White, curdy", correct: false },
+                { text: "Gray, homogeneous", correct: false },
+                { text: "Thick, white", correct: false },
+                { text: "Clear, stretchy", correct: false },
+            ]
+        },
+        {
+            question: "What is the gold standard for diagnosing bacterial vaginosis?",
+            answers: [
+                { text: "Amsel's criteria (clinical)", correct: true },
+                { text: "Vaginal pH >4.5", correct: false },
+                { text: "Whiff test", correct: false },
+                { text: "Gram stain (Nugent score)", correct: false },
+                { text: "Culture", correct: false },
+            ]
+        },
+        {
+            question: "A pregnant woman presents with symptomatic bacterial vaginosis. What is the recommended treatment?",
+            answers: [
+                { text: "Oral metronidazole", correct: true },
+                { text: "Fluconazole", correct: false },
+                { text: "Doxycycline", correct: false },
+                { text: "Estrogen cream", correct: false },
+                { text: "Acyclovir", correct: false },
+            ]
+        },
+        {
+            question: "A patient with persistent vaginal discharge despite treatment for bacterial vaginosis. What is the next step?",
+            answers: [
+                { text: "Test for other STIs (e.g., Trichomonas)", correct: true },
+                { text: "Repeat the same treatment", correct: false },
+                { text: "Perform hysterectomy", correct: false },
+                { text: "Prescribe antifungal", correct: false },
+                { text: "No further action", correct: false },
+            ]
+        },
+        {
+            question: "A postmenopausal woman presents with thin, watery discharge and vaginal dryness. What is the most likely diagnosis?",
+            answers: [
+                { text: "Atrophic vaginitis", correct: true },
+                { text: "Candidiasis", correct: false },
+                { text: "Bacterial vaginosis", correct: false },
+                { text: "Trichomoniasis", correct: false },
+                { text: "Cervical cancer", correct: false },
+            ]
+        },
+        {
+            question: "A woman with vaginal discharge and pelvic pain. Cervical motion tenderness is present. What is the most likely diagnosis?",
+            answers: [
+                { text: "Pelvic inflammatory disease (PID)", correct: true },
+                { text: "Bacterial vaginosis", correct: false },
+                { text: "Candidiasis", correct: false },
+                { text: "Trichomoniasis", correct: false },
+                { text: "Vulvodynia", correct: false },
+            ]
+        },
+        {
+            question: "A patient with recurrent bacterial vaginosis should be advised to avoid which of the following?",
+            answers: [
+                { text: "Douching", correct: true },
+                { text: "Cotton underwear", correct: false },
+                { text: "Probiotics", correct: false },
+                { text: "Barrier contraception", correct: false },
+                { text: "Antibiotic prophylaxis", correct: false },
+            ]
+        },
+        {
+            question: "A patient presents with a thin, grayish-white, homogeneous discharge with a positive \"whiff test.\" Microscopy shows clue cells. The diagnosis is:",
+            answers: [
+                { text: "Bacterial Vaginosis", correct: true },
+                { text: "Trichomoniasis", correct: false },
+                { text: "Candidiasis", correct: false },
+                { text: "Atrophic vaginitis", correct: false },
+                { text: "Gonorrhea", correct: false },
+            ]
+        },
+        {
+            question: "A sexually active 20-year-old presents with a frothy, yellow-green, foul-smelling discharge and vulvar itching. Microscopy shows motile flagellated organisms. The treatment of choice is:",
+            answers: [
+                { text: "Oral Metronidazole 2g single dose", correct: true },
+                { text: "Oral Fluconazole 150mg single dose", correct: false },
+                { text: "Clindamycin cream", correct: false },
+                { text: "Miconazole cream", correct: false },
+                { text: "Doxycycline 100mg BID for 7 days", correct: false },
+            ]
+        },
+        {
+            question: "A diabetic patient presents with thick, white, \"cottage-cheese\" like discharge and severe pruritus. The most likely diagnosis is:",
+            answers: [
+                { text: "Vulvovaginal Candidiasis", correct: true },
+                { text: "Bacterial Vaginosis", correct: false },
+                { text: "Trichomoniasis", correct: false },
+                { text: "Cytolytic Vaginosis", correct: false },
+                { text: "Desquamative Inflammatory Vaginitis", correct: false },
+            ]
+        },
+        {
+            question: "A pregnant patient in her second trimester is diagnosed with Trichomoniasis. What is the recommended treatment?",
+            answers: [
+                { text: "Oral Metronidazole 2g single dose", correct: true },
+                { text: "Metronidazole vaginal gel", correct: false },
+                { text: "Clindamycin cream", correct: false },
+                { text: "Oral Fluconazole", correct: false },
+                { text: "Treatment is deferred until after delivery", correct: false },
+            ]
+        },
+        {
+            question: "A patient with recurrent BV (4 episodes in the past year) has failed standard treatments. A potential next-step management strategy is:",
+            answers: [
+                { text: "Consider suppressive therapy with Metronidazole gel twice weekly for 4-6 months", correct: true },
+                { text: "Use a higher dose of oral Metronidazole for 14 days", correct: false },
+                { text: "Prescribe a combination of antibiotics and antifungals", correct: false },
+                { text: "Recommend a hysterectomy", correct: false },
+                { text: "Advise douching with vinegar solution", correct: false },
+            ]
+        },
+        {
+            question: "A patient presents with persistent vaginal discharge. Microscopy is negative for yeast, clue cells, and trichomonads. The pH is 4.2. The most likely diagnosis is:",
+            answers: [
+                { text: "Physiological discharge", correct: true },
+                { text: "Bacterial Vaginosis", correct: false },
+                { text: "Trichomoniasis", correct: false },
+                { text: "Aerobic Vaginitis", correct: false },
+                { text: "Cervicitis", correct: false },
+            ]
+        },
+        {
+            question: "A patient with profuse purulent vaginal discharge and cervical friability is most likely suffering from:",
+            answers: [
+                { text: "Mucopurulent Cervicitis (e.g., Chlamydia or Gonorrhea)", correct: true },
+                { text: "Bacterial Vaginosis", correct: false },
+                { text: "Vulvovaginal Candidiasis", correct: false },
+                { text: "Atrophic Vaginitis", correct: false },
+                { text: "Genital Herpes", correct: false },
+            ]
+        },
+        {
+            question: "A patient returns with symptoms of BV just 2 weeks after completing treatment. The most appropriate action is:",
+            answers: [
+                { text: "Verify diagnosis and adherence, then consider a different regimen (e.g., Clindamycin)", correct: true },
+                { text: "Assume it's a yeast infection and treat with Fluconazole", correct: false },
+                { text: "Diagnose a drug-resistant strain and refer to an ID specialist", correct: false },
+                { text: "Double the duration of the previous treatment", correct: false },
+                { text: "Do nothing, as it is expected to resolve spontaneously", correct: false },
+            ]
+        },
+        {
+            question: "A patient with recurrent BV reports symptoms after sexual intercourse with a new partner. What is the recommended approach?",
+            answers: [
+                { text: "Treat the patient and consider treating the partner", correct: true },
+                { text: "Treat only the patient", correct: false },
+                { text: "No treatment needed", correct: false },
+                { text: "Recommend condom use only", correct: false },
+                { text: "Antibiotic prophylaxis", correct: false },
+            ]
+        },
+        {
+            question: "A HIV-positive woman with CD4 count <200 presents with severe recurrent candidiasis. What is the management?",
+            answers: [
+                { text: "Prolonged antifungal therapy", correct: true },
+                { text: "Single dose Fluconazole", correct: false },
+                { text: "No treatment needed", correct: false },
+                { text: "Antibacterial therapy", correct: false },
+                { text: "Surgical intervention", correct: false },
+            ]
+        },
+        {
+            question: "A patient develops vaginal discharge after antibiotic therapy for pneumonia. What is the most likely cause?",
+            answers: [
+                { text: "Candidiasis", correct: true },
+                { text: "Trichomoniasis", correct: false },
+                { text: "Bacterial Vaginosis", correct: false },
+                { text: "Gonorrhea", correct: false },
+                { text: "Chlamydia", correct: false },
+            ]
+        },
+        {
+            question: "A 40-year-old with menorrhagia and a 14-week size irregular uterus is suspected to have adenomyosis. The best diagnostic method is:",
+            answers: [
+                { text: "MRI pelvis", correct: true },
+                { text: "Transvaginal ultrasound", correct: false },
+                { text: "Hysteroscopy", correct: false },
+                { text: "Endometrial biopsy", correct: false },
+                { text: "Clinical examination", correct: false },
+            ]
+        },
+        {
+            question: "A patient with an adnexal mass, ascites, and pleural effusion has:",
+            answers: [
+                { text: "Meigs' syndrome", correct: true },
+                { text: "Ovarian hyperstimulation syndrome", correct: false },
+                { text: "Advanced ovarian cancer", correct: false },
+                { text: "Tuberculous peritonitis", correct: false },
+                { text: "Liver cirrhosis", correct: false },
+            ]
+        },
+        {
+            question: "A 7-year-old girl presents with breast development but no pubic hair. What is the most likely diagnosis?",
+            answers: [
+                { text: "Premature thelarche", correct: true },
+                { text: "Central precocious puberty", correct: false },
+                { text: "McCune-Albright syndrome", correct: false },
+                { text: "Adrenal tumor", correct: false },
+                { text: "Normal puberty", correct: false },
+            ]
+        },
+        {
+            question: "A 16-year-old girl has no breast development or menses. Her FSH is elevated. The most likely diagnosis is:",
+            answers: [
+                { text: "Primary ovarian insufficiency (e.g., Turner Syndrome)", correct: true },
+                { text: "Hypothalamic amenorrhea", correct: false },
+                { text: "Constitutional delay of puberty", correct: false },
+                { text: "Polycystic ovary syndrome", correct: false },
+                { text: "Congenital adrenal hyperplasia", correct: false },
+            ]
+        },
+        {
+            question: "A girl with precocious puberty and caf-au-lait spots is most likely to have:",
+            answers: [
+                { text: "McCune-Albright Syndrome", correct: true },
+                { text: "Neurofibromatosis", correct: false },
+                { text: "Tuberous Sclerosis", correct: false },
+                { text: "Turner Syndrome", correct: false },
+                { text: "Kallmann Syndrome", correct: false },
+            ]
+        },
+        {
+            question: "The first-line treatment for central precocious puberty is:",
+            answers: [
+                { text: "GnRH agonists", correct: true },
+                { text: "Aromatase inhibitors", correct: false },
+                { text: "Progestins", correct: false },
+                { text: "Observation", correct: false },
+                { text: "Surgery", correct: false },
+            ]
+        },
+        {
+            question: "A 14-year-old girl has breast development (Tanner stage 4) but no menses. What is the most appropriate initial investigation?",
+            answers: [
+                { text: "Pregnancy test", correct: true },
+                { text: "Karyotype", correct: false },
+                { text: "Pelvic ultrasound", correct: false },
+                { text: "TSH and Prolactin", correct: false },
+                { text: "MRI of the brain", correct: false },
+            ]
+        },
+        {
+            question: "A 7-year-old girl shows breast development. What is the most appropriate initial investigation?",
+            answers: [
+                { text: "Bone age assessment", correct: true },
+                { text: "Pelvic ultrasound", correct: false },
+                { text: "MRI brain", correct: false },
+                { text: "Thyroid function tests", correct: false },
+                { text: "Karyotyping", correct: false },
+            ]
+        },
+        {
+            question: "An 8-year-old girl presents with breast development and vaginal bleeding. Pelvic ultrasound shows an ovarian mass. The most likely diagnosis is:",
+            answers: [
+                { text: "Estrogen-secreting ovarian tumor", correct: true },
+                { text: "Central precocious puberty", correct: false },
+                { text: "Premature thelarche", correct: false },
+                { text: "Hypothyroidism", correct: false },
+                { text: "Foreign body", correct: false },
+            ]
+        },
+        {
+            question: "A 17-year-old with no secondary sexual characteristics, normal height, and anosmia likely has:",
+            answers: [
+                { text: "Kallmann Syndrome", correct: true },
+                { text: "Turner Syndrome", correct: false },
+                { text: "Polycystic Ovary Syndrome", correct: false },
+                { text: "Constitutional Delay", correct: false },
+                { text: "Swyer Syndrome", correct: false },
+            ]
+        },
+        {
+            question: "A 9-year-old girl with pubic hair but no breast development is diagnosed with premature adrenarche. What is the management?",
+            answers: [
+                { text: "Reassurance and observation", correct: true },
+                { text: "Treatment with GnRH agonist", correct: false },
+                { text: "Treatment with corticosteroids", correct: false },
+                { text: "Surgical exploration", correct: false },
+                { text: "Radiation therapy", correct: false },
+            ]
+        },
+        {
+            question: "A girl with delayed puberty is found to have a 46,XY karyotype. The most likely diagnosis is:",
+            answers: [
+                { text: "Swyer Syndrome", correct: true },
+                { text: "Turner Syndrome", correct: false },
+                { text: "Kallmann Syndrome", correct: false },
+                { text: "Androgen Insensitivity Syndrome", correct: false },
+                { text: "Mullerian agenesis", correct: false },
+            ]
+        },
+        {
+            question: "A 7-year-old girl with central precocious puberty is started on Leuprolide. The primary goal of this treatment is:",
+            answers: [
+                { text: "Preserve final adult height", correct: true },
+                { text: "Prevent early menarche", correct: false },
+                { text: "Reduce the risk of ovarian cancer", correct: false },
+                { text: "Alleviate psychological distress", correct: false },
+                { text: "Prevent hirsutism", correct: false },
+            ]
+        },
+        {
+            question: "An 8-year-old girl with breast development and advanced bone age. Pelvic ultrasound shows an ovarian cyst. What is the most likely diagnosis?",
+            answers: [
+                { text: "McCune-Albright syndrome", correct: true },
+                { text: "Central precocious puberty", correct: false },
+                { text: "Premature adrenarche", correct: false },
+                { text: "Ovarian tumor", correct: false },
+                { text: "Hypothyroidism", correct: false },
+            ]
+        },
+        {
+            question: "In the PALM-COEIN classification for AUB, the \"P\" stands for:",
+            answers: [
+                { text: "Polyp", correct: true },
+                { text: "Prolactin", correct: false },
+                { text: "Progesterone", correct: false },
+                { text: "Pregnancy", correct: false },
+                { text: "Perimenopause", correct: false },
+            ]
+        },
+        {
+            question: "The most common cause of abnormal uterine bleeding in reproductive-aged women is:",
+            answers: [
+                { text: "Anovulation (AUB-O)", correct: true },
+                { text: "Leiomyoma (AUB-L)", correct: false },
+                { text: "Coagulopathy (AUB-C)", correct: false },
+                { text: "Endometrial hyperplasia (AUB-E)", correct: false },
+                { text: "Iatrogenic (AUB-I)", correct: false },
+            ]
+        },
+        {
+            question: "A 50-year-old woman with AUB has an endometrial biopsy showing complex hyperplasia without atypia. Management is:",
+            answers: [
+                { text: "Progesterone therapy and repeat biopsy", correct: true },
+                { text: "Total hysterectomy", correct: false },
+                { text: "Hysteroscopic resection", correct: false },
+                { text: "Observation", correct: false },
+                { text: "Radiation therapy", correct: false },
+            ]
+        },
+        {
+            question: "A patient with AUB unresponsive to medical therapy and who has completed childbearing opts for a definitive procedure. The best option is:",
+            answers: [
+                { text: "Endometrial ablation", correct: true },
+                { text: "Hysterectomy", correct: false },
+                { text: "Hysteroscopic myomectomy", correct: false },
+                { text: "Uterine artery embolization", correct: false },
+                { text: "GnRH agonist therapy", correct: false },
+            ]
+        },
+        {
+            question: "A woman develops AUB after starting a new antipsychotic medication. The most likely mechanism is:",
+            answers: [
+                { text: "Hyperprolactinemia (AUB-I)", correct: true },
+                { text: "Drug-induced coagulopathy", correct: false },
+                { text: "Direct endometrial effect", correct: false },
+                { text: "Anovulation from weight gain", correct: false },
+                { text: "Allergic reaction", correct: false },
+            ]
+        },
+        {
+            question: "A patient with AUB and a history of breast cancer on Tamoxifen should initially be evaluated with:",
+            answers: [
+                { text: "Transvaginal ultrasound and endometrial biopsy", correct: true },
+                { text: "MRI pelvis", correct: false },
+                { text: "Hysteroscopy", correct: false },
+                { text: "CA-125 level", correct: false },
+                { text: "Discontinuation of Tamoxifen", correct: false },
+            ]
+        },
+        {
+            question: "A 40-year-old with severe anemia from AUB, refractory to tranexamic acid and oral progesterone, should be offered:",
+            answers: [
+                { text: "Levonorgestrel IUD", correct: true },
+                { text: "High-dose estrogen therapy", correct: false },
+                { text: "Laparoscopic bilateral oophorectomy", correct: false },
+                { text: "Iron infusion alone", correct: false },
+                { text: "Repeat trial of tranexamic acid", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common cause of abnormal uterine bleeding in reproductive-age women?",
+            answers: [
+                { text: "Anovulation", correct: true },
+                { text: "Uterine fibroids", correct: false },
+                { text: "Endometrial polyp", correct: false },
+                { text: "Coagulopathy", correct: false },
+                { text: "Thyroid disorder", correct: false },
+            ]
+        },
+        {
+            question: "A sudden, sharp, unilateral lower abdominal pain in a reproductive-aged woman should first raise suspicion for:",
+            answers: [
+                { text: "Ectopic pregnancy", correct: true },
+                { text: "Ovarian cyst rupture", correct: false },
+                { text: "Mittelschmerz", correct: false },
+                { text: "Appendicitis", correct: false },
+                { text: "Diverticulitis", correct: false },
+            ]
+        },
+        {
+            question: "The most common cause of acute pelvic inflammatory disease (PID) is:",
+            answers: [
+                { text: "Chlamydia trachomatis", correct: true },
+                { text: "Neisseria gonorrhoeae", correct: false },
+                { text: "Mycoplasma genitalium", correct: false },
+                { text: "Escherichia coli", correct: false },
+                { text: "Streptococcus agalactiae", correct: false },
+            ]
+        },
+        {
+            question: "The first-line imaging modality for evaluating acute pelvic pain in a non-pregnant woman is:",
+            answers: [
+                { text: "Transvaginal ultrasound", correct: true },
+                { text: "Abdominal ultrasound", correct: false },
+                { text: "CT scan of abdomen and pelvis", correct: false },
+                { text: "MRI pelvis", correct: false },
+                { text: "X-ray abdomen", correct: false },
+            ]
+        },
+        {
+            question: "The gold standard for diagnosing endometriosis is:",
+            answers: [
+                { text: "Diagnostic laparoscopy with biopsy", correct: true },
+                { text: "Transvaginal ultrasound", correct: false },
+                { text: "Serum CA-125 level", correct: false },
+                { text: "MRI pelvis", correct: false },
+                { text: "Clinical examination alone", correct: false },
+            ]
+        },
+        {
+            question: "A common benign cause of postcoital bleeding is:",
+            answers: [
+                { text: "Cervical ectropion", correct: true },
+                { text: "Cervical cancer", correct: false },
+                { text: "Cervical polyp", correct: false },
+                { text: "Vaginal trauma", correct: false },
+                { text: "Uterine fibroids", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old with acute pelvic pain, cervical motion tenderness, and purulent cervical discharge should be treated for:",
+            answers: [
+                { text: "Pelvic Inflammatory Disease (PID)", correct: true },
+                { text: "Ovarian torsion", correct: false },
+                { text: "Endometriosis", correct: false },
+                { text: "Irritable bowel syndrome", correct: false },
+                { text: "Cystitis", correct: false },
+            ]
+        },
+        {
+            question: "What is the definition of primary amenorrhea?",
+            answers: [
+                { text: "No menses by age 15", correct: true },
+                { text: "No menses by age 12", correct: false },
+                { text: "No menses for 3 months", correct: false },
+                { text: "No menses for 6 months", correct: false },
+                { text: "No menses by age 18", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common cause of secondary amenorrhea?",
+            answers: [
+                { text: "Pregnancy", correct: true },
+                { text: "Polycystic ovary syndrome", correct: false },
+                { text: "Hypothyroidism", correct: false },
+                { text: "Hyperprolactinemia", correct: false },
+                { text: "Premature ovarian failure", correct: false },
+            ]
+        },
+        {
+            question: "A 18-year-old with primary amenorrhea, normal breast development, and cyclical pelvic pain. What is the most likely diagnosis?",
+            answers: [
+                { text: "Imperforate hymen", correct: true },
+                { text: "Mullerian agenesis", correct: false },
+                { text: "Androgen insensitivity", correct: false },
+                { text: "Turner syndrome", correct: false },
+                { text: "Swyer syndrome", correct: false },
+            ]
+        },
+        {
+            question: "A 28-year-old with secondary amenorrhea after D&C for postpartum hemorrhage. What is the most likely diagnosis?",
+            answers: [
+                { text: "Asherman's syndrome", correct: true },
+                { text: "Sheehan's syndrome", correct: false },
+                { text: "Premature ovarian failure", correct: false },
+                { text: "Polycystic ovary syndrome", correct: false },
+                { text: "Hyperprolactinemia", correct: false },
+            ]
+        },
+        {
+            question: "A 22-year-old with amenorrhea, hirsutism, and obesity. What is the most likely diagnosis and initial test?",
+            answers: [
+                { text: "PCOS; pelvic ultrasound", correct: true },
+                { text: "CAH; 17-OH progesterone", correct: false },
+                { text: "Cushing's; cortisol", correct: false },
+                { text: "Thyroid disorder; TSH", correct: false },
+                { text: "Hyperprolactinemia; prolactin", correct: false },
+            ]
+        },
+        {
+            question: "A 40-year-old with amenorrhea and symptoms of estrogen deficiency. FSH is 12 mIU/mL. What is the next step?",
+            answers: [
+                { text: "Repeat FSH in 1-2 months", correct: true },
+                { text: "Start hormone therapy", correct: false },
+                { text: "Perform karyotype", correct: false },
+                { text: "MRI pituitary", correct: false },
+                { text: "Laparoscopy", correct: false },
+            ]
+        },
+        {
+            question: "A 17-year-old with primary amenorrhea, no breast development, and elevated FSH. What is the most appropriate next investigation?",
+            answers: [
+                { text: "Karyotype", correct: true },
+                { text: "Pelvic ultrasound", correct: false },
+                { text: "MRI brain", correct: false },
+                { text: "Thyroid function", correct: false },
+                { text: "Prolactin level", correct: false },
+            ]
+        },
+        {
+            question: "Primary amenorrhea is defined as the absence of menses by age:",
+            answers: [
+                { text: "15", correct: true },
+                { text: "12", correct: false },
+                { text: "13", correct: false },
+                { text: "16", correct: false },
+                { text: "18", correct: false },
+            ]
+        },
+        {
+            question: "A 28-year-old with secondary amenorrhea has an elevated FSH level. The diagnosis is:",
+            answers: [
+                { text: "Premature Ovarian Insufficiency (POI)", correct: true },
+                { text: "Polycystic Ovary Syndrome (PCOS)", correct: false },
+                { text: "Functional Hypothalamic Amenorrhea", correct: false },
+                { text: "Hyperprolactinemia", correct: false },
+                { text: "Thyroid disorder", correct: false },
+            ]
+        },
+        {
+            question: "A patient with PCOS and amenorrhea desiring pregnancy should be offered first-line ovulation induction with:",
+            answers: [
+                { text: "Clomiphene Citrate", correct: true },
+                { text: "Metformin", correct: false },
+                { text: "Letrozole", correct: false },
+                { text: "Gonadotropins", correct: false },
+                { text: "Laparoscopic ovarian drilling", correct: false },
+            ]
+        },
+        {
+            question: "A patient with amenorrhea and symptoms of vaginal dryness and hot flashes is found to have a normal FSH. What is the next step?",
+            answers: [
+                { text: "Repeat FSH or check Estradiol level", correct: true },
+                { text: "Start hormone replacement therapy", correct: false },
+                { text: "Perform a karyotype", correct: false },
+                { text: "Order an MRI of the pituitary", correct: false },
+                { text: "Do a progesterone challenge test", correct: false },
+            ]
+        },
+        {
+            question: "A woman with hyperprolactinemia and a microadenoma on MRI who desires pregnancy should be treated with:",
+            answers: [
+                { text: "Cabergoline", correct: true },
+                { text: "Surgical resection of the tumor", correct: false },
+                { text: "Radiation therapy", correct: false },
+                { text: "Observation", correct: false },
+                { text: "Estrogen-progesterone therapy", correct: false },
+            ]
+        },
+        {
+            question: "A patient with constitutional delay of puberty and primary amenorrhea is best managed with:",
+            answers: [
+                { text: "Reassurance and observation if no other pathology is found", correct: true },
+                { text: "Estrogen replacement therapy", correct: false },
+                { text: "Gonadotropin therapy", correct: false },
+                { text: "Surgical exploration", correct: false },
+                { text: "Psychological counseling only", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old woman is found to have a 7 cm cystic ovarian mass on ultrasound. The mass contains both solid and cystic components with calcifications and hair-like structures. What is the most likely diagnosis?",
+            answers: [
+                { text: "Mature cystic teratoma (dermoid cyst)", correct: true },
+                { text: "Serous cystadenoma", correct: false },
+                { text: "Endometrioma", correct: false },
+                { text: "Mucinous cystadenoma", correct: false },
+                { text: "Granulosa cell tumor", correct: false },
+            ]
+        },
+        {
+            question: "Infertility is defined as the inability to achieve a pregnancy after how long of unprotected intercourse?",
+            answers: [
+                { text: "1 year", correct: true },
+                { text: "6 months", correct: false },
+                { text: "2 years", correct: false },
+                { text: "18 months", correct: false },
+                { text: "3 years", correct: false },
+            ]
+        },
+        {
+            question: "The most common cause of female infertility is:",
+            answers: [
+                { text: "Ovulatory dysfunction", correct: true },
+                { text: "Tubal factor", correct: false },
+                { text: "Endometriosis", correct: false },
+                { text: "Uterine factor", correct: false },
+                { text: "Unexplained", correct: false },
+            ]
+        },
+        {
+            question: "The initial test for evaluating ovulation is:",
+            answers: [
+                { text: "Mid-luteal phase serum progesterone", correct: true },
+                { text: "Basal body temperature charting", correct: false },
+                { text: "Urinary LH kits", correct: false },
+                { text: "Endometrial biopsy", correct: false },
+                { text: "Transvaginal ultrasound", correct: false },
+            ]
+        },
+        {
+            question: "The gold standard test for assessing tubal patency is:",
+            answers: [
+                { text: "Hysterosalpingography (HSG)", correct: true },
+                { text: "Laparoscopy with chromotubation", correct: false },
+                { text: "Transvaginal ultrasound", correct: false },
+                { text: "Saline infusion sonography", correct: false },
+                { text: "Hysteroscopy", correct: false },
+            ]
+        },
+        {
+            question: "The most common cause of male factor infertility is:",
+            answers: [
+                { text: "Idiopathic abnormal semen parameters", correct: true },
+                { text: "Varicocele", correct: false },
+                { text: "Obstructive azoospermia", correct: false },
+                { text: "Genetic disorders", correct: false },
+                { text: "Hormonal imbalances", correct: false },
+            ]
+        },
+        {
+            question: "A couple presents after 1 year of infertility. The woman has regular cycles. What is the most appropriate first step in evaluation?",
+            answers: [
+                { text: "Semen analysis", correct: true },
+                { text: "Hysterosalpingography (HSG)", correct: false },
+                { text: "Laparoscopy", correct: false },
+                { text: "Serum progesterone check", correct: false },
+                { text: "Transvaginal ultrasound", correct: false },
+            ]
+        },
+        {
+            question: "A patient with severe male factor infertility (azoospermia) may require:",
+            answers: [
+                { text: "IVF with ICSI using surgically retrieved sperm", correct: true },
+                { text: "Intrauterine insemination (IUI)", correct: false },
+                { text: "Donor sperm insemination", correct: false },
+                { text: "Adoption", correct: false },
+                { text: "Clomiphene treatment for the female partner", correct: false },
+            ]
+        },
+        {
+            question: "A woman with stage IV endometriosis and infertility, failing to conceive after surgery, should be offered:",
+            answers: [
+                { text: "In Vitro Fertilization (IVF)", correct: true },
+                { text: "Another laparoscopic surgery", correct: false },
+                { text: "Superovulation with IUI", correct: false },
+                { text: "Danazol treatment", correct: false },
+                { text: "High-dose progesterone", correct: false },
+            ]
+        },
+        {
+            question: "The primary benefit of using Letrozole over Clomiphene for ovulation induction in PCOS is:",
+            answers: [
+                { text: "Higher live birth rate and lower multiple gestation risk", correct: true },
+                { text: "It is cheaper", correct: false },
+                { text: "It has fewer side effects", correct: false },
+                { text: "It requires less monitoring", correct: false },
+                { text: "It is effective in women with low AMH", correct: false },
+            ]
+        },
+        {
+            question: "A patient with unilateral tubal occlusion on HSG and no other factors should be initially managed with:",
+            answers: [
+                { text: "Expectant management or ovulation induction with timed intercourse", correct: true },
+                { text: "In Vitro Fertilization (IVF)", correct: false },
+                { text: "Surgical tubal reconstruction", correct: false },
+                { text: "Laparoscopy to confirm the finding", correct: false },
+                { text: "Intrauterine insemination (IUI)", correct: false },
+            ]
+        },
+        {
+            question: "A woman with hypothyroidism and infertility should be:",
+            answers: [
+                { text: "Treated with levothyroxine to normalize TSH", correct: true },
+                { text: "Treated with Clomiphene immediately", correct: false },
+                { text: "Referred directly for IVF", correct: false },
+                { text: "Advised to adopt", correct: false },
+                { text: "Told that thyroid disease does not affect fertility", correct: false },
+            ]
+        },
+        {
+            question: "What is the definition of infertility?",
+            answers: [
+                { text: "No conception after 1 year of unprotected intercourse", correct: true },
+                { text: "No conception after 6 months", correct: false },
+                { text: "No conception after 2 years", correct: false },
+                { text: "Never being able to conceive", correct: false },
+                { text: "Only secondary infertility", correct: false },
+            ]
+        },
+        {
+            question: "A woman with bilateral tubal blockage on HSG. What is the most appropriate treatment?",
+            answers: [
+                { text: "In vitro fertilization (IVF)", correct: true },
+                { text: "Tubal surgery", correct: false },
+                { text: "Ovulation induction", correct: false },
+                { text: "IUI", correct: false },
+                { text: "Expectant management", correct: false },
+            ]
+        },
+        {
+            question: "A couple with male factor infertility (oligospermia). What is the recommended treatment?",
+            answers: [
+                { text: "Intracytoplasmic sperm injection (ICSI)", correct: true },
+                { text: "Intrauterine insemination (IUI)", correct: false },
+                { text: "Donor sperm", correct: false },
+                { text: "Surgery", correct: false },
+                { text: "Medication", correct: false },
+            ]
+        },
+        {
+            question: "A 35-year-old with stage III endometriosis and infertility. What is the most appropriate treatment?",
+            answers: [
+                { text: "IVF", correct: true },
+                { text: "Surgery alone", correct: false },
+                { text: "Medical therapy", correct: false },
+                { text: "IUI", correct: false },
+                { text: "Expectant management", correct: false },
+            ]
+        },
+        {
+            question: "A woman with unexplained infertility after basic evaluation. What is the next step?",
+            answers: [
+                { text: "Intrauterine insemination with ovulation induction", correct: true },
+                { text: "Immediately proceed to IVF", correct: false },
+                { text: "Laparoscopy", correct: false },
+                { text: "Donor eggs", correct: false },
+                { text: "Surrogacy", correct: false },
+            ]
+        },
+        {
+            question: "A couple with recurrent pregnancy loss. What evaluation is indicated?",
+            answers: [
+                { text: "Parental karyotyping", correct: true },
+                { text: "HSG", correct: false },
+                { text: "Semen analysis", correct: false },
+                { text: "Ovulation testing", correct: false },
+                { text: "Endometrial biopsy", correct: false },
+            ]
+        },
+        {
+            question: "A 40-year-old woman with low AMH and infertility. What is the most appropriate recommendation?",
+            answers: [
+                { text: "In vitro fertilization with own eggs", correct: true },
+                { text: "Donor eggs", correct: false },
+                { text: "Ovulation induction", correct: false },
+                { text: "IUI", correct: false },
+                { text: "Adoption", correct: false },
+            ]
+        },
+        {
+            question: "What are the Rotterdam criteria for PCOS diagnosis?",
+            answers: [
+                { text: "2 out of 3: oligo/anovulation, clinical/biochemical hyperandrogenism, polycystic ovaries", correct: true },
+                { text: "Only ovarian cysts on ultrasound", correct: false },
+                { text: "Only menstrual irregularities", correct: false },
+                { text: "Only hirsutism", correct: false },
+                { text: "Only obesity", correct: false },
+            ]
+        },
+        {
+            question: "What is the primary underlying pathophysiology of PCOS?",
+            answers: [
+                { text: "Insulin resistance", correct: true },
+                { text: "Thyroid dysfunction", correct: false },
+                { text: "Adrenal insufficiency", correct: false },
+                { text: "Pituitary tumor", correct: false },
+                { text: "Autoimmune disorder", correct: false },
+            ]
+        },
+        {
+            question: "A PCOS patient with BMI 35 and infertility. What is the first recommendation?",
+            answers: [
+                { text: "Weight loss and lifestyle modification", correct: true },
+                { text: "Immediate IVF", correct: false },
+                { text: "Bariatric surgery", correct: false },
+                { text: "Ovulation induction", correct: false },
+                { text: "Metformin only", correct: false },
+            ]
+        },
+        {
+            question: "A woman with hirsutism has elevated 17-OH progesterone. What is the diagnosis?",
+            answers: [
+                { text: "Non-classical congenital adrenal hyperplasia", correct: true },
+                { text: "PCOS", correct: false },
+                { text: "Adrenal tumor", correct: false },
+                { text: "Ovarian tumor", correct: false },
+                { text: "Cushing's syndrome", correct: false },
+            ]
+        },
+        {
+            question: "A PCOS patient develops endometrial hyperplasia. What is the most appropriate management?",
+            answers: [
+                { text: "Progestin therapy", correct: true },
+                { text: "Hysterectomy", correct: false },
+                { text: "Endometrial ablation", correct: false },
+                { text: "Metformin", correct: false },
+                { text: "Observation", correct: false },
+            ]
+        },
+        {
+            question: "A patient with PCOS and severe acne unresponsive to topical treatment. What is the best systemic therapy?",
+            answers: [
+                { text: "Combined oral contraceptive pills", correct: true },
+                { text: "Antibiotics only", correct: false },
+                { text: "Isotretinoin", correct: false },
+                { text: "Spironolactone", correct: false },
+                { text: "Metformin", correct: false },
+            ]
+        },
+        {
+            question: "A lean woman with PCOS and normal insulin levels fails to ovulate on Letrozole. The next step is:",
+            answers: [
+                { text: "Gonadotropin injections", correct: true },
+                { text: "Laparoscopic ovarian drilling", correct: false },
+                { text: "In Vitro Fertilization (IVF)", correct: false },
+                { text: "Metformin therapy", correct: false },
+                { text: "Use of Clomiphene instead", correct: false },
+            ]
+        },
+        {
+            question: "A patient with PCOS and infertility has a partner with severe oligospermia. The recommended treatment is:",
+            answers: [
+                { text: "In Vitro Fertilization with ICSI", correct: true },
+                { text: "Superovulation with IUI", correct: false },
+                { text: "Clomiphene Citrate", correct: false },
+                { text: "Letrozole", correct: false },
+                { text: "Donor sperm insemination", correct: false },
+            ]
+        },
+        {
+            question: "A woman with PCOS desires conception and has a BMI of 40. The most appropriate initial advice is:",
+            answers: [
+                { text: "Weight loss before attempting ovulation induction", correct: true },
+                { text: "Start Letrozole immediately", correct: false },
+                { text: "Proceed directly to IVF", correct: false },
+                { text: "Start Metformin alone", correct: false },
+                { text: "Use a gestational carrier", correct: false },
+            ]
+        },
+        {
+            question: "A patient with PCOS on Spironolactone for hirsutism suddenly desires pregnancy. The correct action is:",
+            answers: [
+                { text: "Stop Spironolactone and switch to COCP for 1-2 cycles before conception", correct: true },
+                { text: "Continue Spironolactone until pregnancy is confirmed", correct: false },
+                { text: "Replace Spironolactone with Finasteride", correct: false },
+                { text: "Advise that it is safe to conceive on Spironolactone", correct: false },
+                { text: "Refer for immediate IVF", correct: false },
+            ]
+        },
+        {
+            question: "A patient with PCOS and acanthosis nigricans should be screened for:",
+            answers: [
+                { text: "Impaired glucose tolerance / Type 2 Diabetes", correct: true },
+                { text: "Cushing's syndrome", correct: false },
+                { text: "Adrenal insufficiency", correct: false },
+                { text: "Hyperthyroidism", correct: false },
+                { text: "Liver dysfunction", correct: false },
+            ]
+        },
+        {
+            question: "A sudden, sharp, unilateral lower abdominal pain in a reproductive-aged woman should first raise suspicion for:",
+            answers: [
+                { text: "Ectopic pregnancy", correct: true },
+                { text: "Ovarian cyst rupture", correct: false },
+                { text: "Mittelschmerz", correct: false },
+                { text: "Appendicitis", correct: false },
+                { text: "Diverticulitis", correct: false },
+            ]
+        },
+        {
+            question: "The most common cause of pelvic organ prolapse is:",
+            answers: [
+                { text: "Vaginal childbirth", correct: true },
+                { text: "Chronic constipation", correct: false },
+                { text: "Hysterectomy", correct: false },
+                { text: "Obesity", correct: false },
+                { text: "Connective tissue disorders", correct: false },
+            ]
+        },
+        {
+            question: "The Pelvic Organ Prolapse Quantification (POP-Q) system stages prolapse from:",
+            answers: [
+                { text: "0 to IV", correct: true },
+                { text: "I to IV", correct: false },
+                { text: "I to III", correct: false },
+                { text: "A to D", correct: false },
+                { text: "Mild to Severe", correct: false },
+            ]
+        },
+        {
+            question: "A 65-year-old woman with a stage III cystocele complains of stress urinary incontinence. The best surgical option addressing both issues is:",
+            answers: [
+                { text: "Anterior colporrhaphy with mid-urethral sling", correct: true },
+                { text: "Vaginal hysterectomy alone", correct: false },
+                { text: "Sacrocolpopexy", correct: false },
+                { text: "Pessary insertion", correct: false },
+                { text: "Posterior colporrhaphy", correct: false },
+            ]
+        },
+        {
+            question: "A patient with uterine prolapse and enterocele should undergo:",
+            answers: [
+                { text: "Posterior colporrhaphy", correct: true },
+                { text: "Anterior colporrhaphy", correct: false },
+                { text: "Sacrospinous ligament fixation", correct: false },
+                { text: "Uterosacral ligament suspension", correct: false },
+                { text: "Burch colposuspension", correct: false },
+            ]
+        },
+        {
+            question: "A good candidate for a vaginal pessary is:",
+            answers: [
+                { text: "A woman who wishes to avoid surgery or is a poor surgical candidate", correct: true },
+                { text: "A woman with stage IV prolapse", correct: false },
+                { text: "A woman with an active vaginal infection", correct: false },
+                { text: "A woman who is sexually active and wants a permanent solution", correct: false },
+                { text: "A woman with uterine prolapse and cervical elongation", correct: false },
+            ]
+        },
+        {
+            question: "A postmenopausal woman with prolapse and vaginal atrophy should be treated with:",
+            answers: [
+                { text: "Topical vaginal estrogen", correct: true },
+                { text: "Systemic Hormone Replacement Therapy (HRT)", correct: false },
+                { text: "Antibiotic cream", correct: false },
+                { text: "Steroid cream", correct: false },
+                { text: "Regular douching", correct: false },
+            ]
+        },
+        {
+            question: "A patient develops dyspareunia and recurrent UTI after an anterior colporrhaphy with mesh. The most likely complication is:",
+            answers: [
+                { text: "Mesh erosion", correct: true },
+                { text: "Pelvic infection", correct: false },
+                { text: "Urinary fistula", correct: false },
+                { text: "Nerve injury", correct: false },
+                { text: "Vaginal stenosis", correct: false },
+            ]
+        },
+        {
+            question: "A woman with recurrent vault prolapse after hysterectomy is best treated with:",
+            answers: [
+                { text: "Abdominal sacrocolpopexy", correct: true },
+                { text: "Repeat vaginal repair", correct: false },
+                { text: "Vaginal pessary", correct: false },
+                { text: "Levator plication", correct: false },
+                { text: "Colpocleisis", correct: false },
+            ]
+        },
+        {
+            question: "A frail, elderly woman with significant comorbidities and stage IV prolapse who is not sexually active would benefit most from:",
+            answers: [
+                { text: "Colpocleisis", correct: true },
+                { text: "Sacrospinous ligament fixation", correct: false },
+                { text: "Vaginal hysterectomy", correct: false },
+                { text: "Pessary trial", correct: false },
+                { text: "Abdominal sacrocolpopexy", correct: false },
+            ]
+        },
+        {
+            question: "A patient with uterine prolapse and stress urinary incontinence undergoes surgery. Postoperatively, she has difficulty voiding. The initial management is:",
+            answers: [
+                { text: "Intermittent self-catheterization", correct: true },
+                { text: "Indwelling Foley catheter for one week", correct: false },
+                { text: "Surgical revision", correct: false },
+                { text: "Alpha-blocker medication", correct: false },
+                { text: "Diuretics", correct: false },
+            ]
+        },
+        {
+            question: "During a sacrospinous ligament fixation, the structure most at risk for injury is:",
+            answers: [
+                { text: "Pudendal nerve and vessels", correct: true },
+                { text: "Ureter", correct: false },
+                { text: "Sciatic nerve", correct: false },
+                { text: "Obturator nerve", correct: false },
+                { text: "Inferior epigastric artery", correct: false },
+            ]
+        },
+        {
+            question: "A 75-year-old with multiple comorbidities and complete procidentia. What is the safest surgical option?",
+            answers: [
+                { text: "LeFort colpocleisis", correct: true },
+                { text: "Vaginal hysterectomy", correct: false },
+                { text: "Abdominal sacrocolpopexy", correct: false },
+                { text: "Laparoscopic repair", correct: false },
+                { text: "Uterine suspension", correct: false },
+            ]
+        },
+        {
+            question: "What defines natural menopause?",
+            answers: [
+                { text: "12 months of amenorrhea after age 45", correct: true },
+                { text: "Any cessation of menses", correct: false },
+                { text: "Surgical removal of ovaries", correct: false },
+                { text: "Cessation of periods at any age", correct: false },
+                { text: "When FSH >20 mIU/mL", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common symptom of menopause?",
+            answers: [
+                { text: "Vasomotor symptoms (hot flashes)", correct: true },
+                { text: "Vaginal dryness", correct: false },
+                { text: "Mood changes", correct: false },
+                { text: "Sleep disturbances", correct: false },
+                { text: "Joint pains", correct: false },
+            ]
+        },
+        {
+            question: "What is first-line for treating vasomotor symptoms?",
+            answers: [
+                { text: "Hormone therapy", correct: true },
+                { text: "SSRIs", correct: false },
+                { text: "Clonidine", correct: false },
+                { text: "Gabapentin", correct: false },
+                { text: "Vitamin E", correct: false },
+            ]
+        },
+        {
+            question: "What is the primary indication for systemic hormone therapy?",
+            answers: [
+                { text: "Moderate-severe vasomotor symptoms", correct: true },
+                { text: "Prevention of heart disease", correct: false },
+                { text: "Treatment of osteoporosis only", correct: false },
+                { text: "Improving libido", correct: false },
+                { text: "Preventing dementia", correct: false },
+            ]
+        },
+        {
+            question: "A 48-year-old with premature ovarian insufficiency. What is the management?",
+            answers: [
+                { text: "Hormone therapy until average menopause age", correct: true },
+                { text: "No treatment needed", correct: false },
+                { text: "Herbal medicine only", correct: false },
+                { text: "Testosterone therapy", correct: false },
+                { text: "Chemotherapy", correct: false },
+            ]
+        },
+        {
+            question: "A woman with history of DVT wants menopausal therapy. What is safest?",
+            answers: [
+                { text: "Transdermal estrogen", correct: true },
+                { text: "Oral estrogen", correct: false },
+                { text: "No hormone therapy", correct: false },
+                { text: "Testosterone only", correct: false },
+                { text: "Progestin only", correct: false },
+            ]
+        },
+        {
+            question: "A patient on tamoxifen for breast cancer has severe vulvovaginal symptoms. What is appropriate?",
+            answers: [
+                { text: "Non-hormonal moisturizers", correct: true },
+                { text: "Vaginal estrogen", correct: false },
+                { text: "Systemic estrogen", correct: false },
+                { text: "Testosterone", correct: false },
+                { text: "Laser therapy", correct: false },
+            ]
+        },
+        {
+            question: "A postmenopausal woman with abnormal bleeding on hormone therapy. What is the next step?",
+            answers: [
+                { text: "Endometrial evaluation", correct: true },
+                { text: "Increase hormone dose", correct: false },
+                { text: "Switch to different regimen", correct: false },
+                { text: "Stop all treatment", correct: false },
+                { text: "Add testosterone", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common form of precocious puberty in girls?",
+            answers: [
+                { text: "Central precocious puberty", correct: true },
+                { text: "Peripheral precocious puberty", correct: false },
+                { text: "Premature thelarche", correct: false },
+                { text: "Congenital adrenal hyperplasia", correct: false },
+                { text: "none of them", correct: false },
+            ]
+        },
+        {
+            question: "In cases of suspected delayed puberty, which of the following should be the first step in evaluation?",
+            answers: [
+                { text: "Detailed medical history and physical examination", correct: true },
+                { text: "Pelvic ultrasound", correct: false },
+                { text: "Hormonal therapy", correct: false },
+                { text: "MRI of the brain", correct: false },
+                { text: "none of them", correct: false },
+            ]
+        },
+        {
+            question: "A 58-year-old woman on continuous combined HT for 5 years presents with unscheduled bleeding. The first step is:",
+            answers: [
+                { text: "Endometrial assessment (biopsy)", correct: true },
+                { text: "Increase the progestin dose", correct: false },
+                { text: "Stop HT immediately", correct: false },
+                { text: "Switch to estrogen-only therapy", correct: false },
+                { text: "Perform a hysterectomy", correct: false },
+            ]
+        },
+        {
+            question: "A patient with premature ovarian insufficiency (POI) should be managed with:",
+            answers: [
+                { text: "Hormone Therapy at least until the average age of menopause", correct: true },
+                { text: "Calcium and Vitamin D only", correct: false },
+                { text: "SSRIs for symptom control", correct: false },
+                { text: "Clomiphene for ovulation induction", correct: false },
+                { text: "Observation only", correct: false },
+            ]
+        },
+        {
+            question: "A menopausal woman with urogenital symptoms but contraindications to even topical estrogen could be treated with:",
+            answers: [
+                { text: "Ospemifene", correct: true },
+                { text: "Systemic HT", correct: false },
+                { text: "Testosterone cream", correct: false },
+                { text: "Vaginal dehydroepiandrosterone (DHEA)", correct: false },
+                { text: "Laser therapy", correct: false },
+            ]
+        },
+        {
+            question: "The Women's Health Initiative (WHI) study primarily showed an increased risk with combined HT of:",
+            answers: [
+                { text: "Breast cancer and venous thromboembolism", correct: true },
+                { text: "Ovarian cancer", correct: false },
+                { text: "Lung cancer", correct: false },
+                { text: "Colon cancer", correct: false },
+                { text: "Thyroid cancer", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common cause of cervical cancer?",
+            answers: [
+                { text: "HPV infection", correct: true },
+                { text: "Herpes virus", correct: false },
+                { text: "HIV", correct: false },
+                { text: "Smoking", correct: false },
+                { text: "Chlamydia", correct: false },
+            ]
+        },
+        {
+            question: "What is the first-line screening for cervical cancer?",
+            answers: [
+                { text: "Pap smear", correct: true },
+                { text: "HPV testing", correct: false },
+                { text: "Colposcopy", correct: false },
+                { text: "Biopsy", correct: false },
+                { text: "Visual inspection", correct: false },
+            ]
+        },
+        {
+            question: "What is the management of CIN 1?",
+            answers: [
+                { text: "Observation with follow-up", correct: true },
+                { text: "LEEP", correct: false },
+                { text: "Cold knife conization", correct: false },
+                { text: "Hysterectomy", correct: false },
+                { text: "Radiation", correct: false },
+            ]
+        },
+        {
+            question: "What is the treatment for microinvasive cervical cancer (IA1)?",
+            answers: [
+                { text: "Cone biopsy", correct: true },
+                { text: "Radical hysterectomy", correct: false },
+                { text: "Chemotherapy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Immunotherapy", correct: false },
+            ]
+        },
+        {
+            question: "A 30-year-old with ASC-US Pap smear. What is the next step?",
+            answers: [
+                { text: "HPV testing", correct: true },
+                { text: "Repeat Pap in 1 year", correct: false },
+                { text: "Colposcopy", correct: false },
+                { text: "LEEP", correct: false },
+                { text: "Hysterectomy", correct: false },
+            ]
+        },
+        {
+            question: "A patient with HSIL on Pap smear. What is the management?",
+            answers: [
+                { text: "Colposcopy with biopsy", correct: true },
+                { text: "Repeat Pap in 6 months", correct: false },
+                { text: "HPV testing", correct: false },
+                { text: "Cryotherapy", correct: false },
+                { text: "Hysterectomy", correct: false },
+            ]
+        },
+        {
+            question: "A 35-year-old with CIN 3 on biopsy. What is the treatment?",
+            answers: [
+                { text: "LEEP procedure", correct: true },
+                { text: "Observation", correct: false },
+                { text: "Chemotherapy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Vaccination", correct: false },
+            ]
+        },
+        {
+            question: "A woman with stage IB1 cervical cancer desires fertility. What is appropriate?",
+            answers: [
+                { text: "Radical trachelectomy", correct: true },
+                { text: "Radical hysterectomy", correct: false },
+                { text: "Chemoradiation", correct: false },
+                { text: "Simple hysterectomy", correct: false },
+                { text: "Observation", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old with CIN 2 wants future fertility. What is the best treatment?",
+            answers: [
+                { text: "LEEP conization", correct: true },
+                { text: "Cold knife conization", correct: false },
+                { text: "Hysterectomy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Ablation", correct: false },
+            ]
+        },
+        {
+            question: "A patient with recurrent cervical cancer after radiation. What is the treatment?",
+            answers: [
+                { text: "Pelvic exenteration", correct: true },
+                { text: "Additional radiation", correct: false },
+                { text: "Chemotherapy only", correct: false },
+                { text: "Immunotherapy", correct: false },
+                { text: "Palliative care only", correct: false },
+            ]
+        },
+        {
+            question: "A woman with stage IVB cervical cancer. What is the primary treatment?",
+            answers: [
+                { text: "Systemic chemotherapy", correct: true },
+                { text: "Radical surgery", correct: false },
+                { text: "Radiation therapy", correct: false },
+                { text: "Hormonal therapy", correct: false },
+                { text: "Immunotherapy only", correct: false },
+            ]
+        },
+        {
+            question: "A patient with positive margins after LEEP for CIN 3. What is the next step?",
+            answers: [
+                { text: "Repeat excision", correct: true },
+                { text: "Hysterectomy", correct: false },
+                { text: "Observation", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Chemotherapy", correct: false },
+            ]
+        },
+        {
+            question: "A pregnant woman with abnormal Pap showing HSIL. What is management?",
+            answers: [
+                { text: "Colposcopy without endocervical curettage", correct: true },
+                { text: "Immediate LEEP", correct: false },
+                { text: "Termination of pregnancy", correct: false },
+                { text: "Delivery then treatment", correct: false },
+                { text: "No evaluation needed", correct: false },
+            ]
+        },
+        {
+            question: "A 28-year-old pregnant woman at 16 weeks is diagnosed with CIN 3. Management is:",
+            answers: [
+                { text: "Defer treatment and repeat colposcopy postpartum", correct: true },
+                { text: "Perform LEEP immediately", correct: false },
+                { text: "Terminate pregnancy and treat", correct: false },
+                { text: "Perform cold knife cone biopsy", correct: false },
+                { text: "Start topical chemotherapy", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common benign uterine tumor?",
+            answers: [
+                { text: "Leiomyoma (fibroids)", correct: true },
+                { text: "Adenomyosis", correct: false },
+                { text: "Endometrial polyp", correct: false },
+                { text: "Endometrial hyperplasia", correct: false },
+                { text: "Sarcoma", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common type of ovarian cancer?",
+            answers: [
+                { text: "Epithelial ovarian cancer", correct: true },
+                { text: "Germ cell tumors", correct: false },
+                { text: "Sex cord-stromal tumors", correct: false },
+                { text: "Metastatic tumors", correct: false },
+                { text: "Borderline tumors", correct: false },
+            ]
+        },
+        {
+            question: "What is the most common symptom of endometrial cancer?",
+            answers: [
+                { text: "Postmenopausal bleeding", correct: true },
+                { text: "Pelvic pain", correct: false },
+                { text: "Abdominal distension", correct: false },
+                { text: "Urinary symptoms", correct: false },
+                { text: "Weight loss", correct: false },
+            ]
+        },
+        {
+            question: "What is the primary treatment for early-stage endometrial cancer?",
+            answers: [
+                { text: "Total hysterectomy with BSO", correct: true },
+                { text: "Radiation alone", correct: false },
+                { text: "Chemotherapy alone", correct: false },
+                { text: "Hormonal therapy", correct: false },
+                { text: "Immunotherapy", correct: false },
+            ]
+        },
+        {
+            question: "A 45-year-old with heavy bleeding and 8-week size uterus with fibroids. What is the treatment?",
+            answers: [
+                { text: "Myomectomy", correct: true },
+                { text: "Hysterectomy", correct: false },
+                { text: "Uterine artery embolization", correct: false },
+                { text: "Medical management", correct: false },
+                { text: "Radiation", correct: false },
+            ]
+        },
+        {
+            question: "A postmenopausal woman with complex ovarian cyst and CA-125 35 U/mL. What is next?",
+            answers: [
+                { text: "Surgical evaluation", correct: true },
+                { text: "Repeat US in 3 months", correct: false },
+                { text: "Chemotherapy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Hormonal therapy", correct: false },
+            ]
+        },
+        {
+            question: "A 55-year-old with postmenopausal bleeding and endometrial thickness 8mm. What is next?",
+            answers: [
+                { text: "Endometrial biopsy", correct: true },
+                { text: "Hysterectomy", correct: false },
+                { text: "Hormonal therapy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Observation", correct: false },
+            ]
+        },
+        {
+            question: "A woman with stage III ovarian cancer. What is the primary treatment?",
+            answers: [
+                { text: "Debulking surgery + chemotherapy", correct: true },
+                { text: "Chemotherapy alone", correct: false },
+                { text: "Radiation alone", correct: false },
+                { text: "Hormonal therapy", correct: false },
+                { text: "Immunotherapy", correct: false },
+            ]
+        },
+        {
+            question: "A 40-year-old with symptomatic adenomyosis failed medical therapy. What is definitive treatment?",
+            answers: [
+                { text: "Hysterectomy", correct: true },
+                { text: "Uterine artery embolization", correct: false },
+                { text: "Endometrial ablation", correct: false },
+                { text: "LNG-IUD", correct: false },
+                { text: "GnRH agonists", correct: false },
+            ]
+        },
+        {
+            question: "A premenopausal woman with grade 1 endometrial cancer desires fertility. What is appropriate?",
+            answers: [
+                { text: "Progestin therapy", correct: true },
+                { text: "Hysterectomy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Chemotherapy", correct: false },
+                { text: "Observation", correct: false },
+            ]
+        },
+        {
+            question: "A patient with BRCA mutation wants ovarian cancer prevention. What is recommended?",
+            answers: [
+                { text: "Risk-reducing salpingo-oophorectomy", correct: true },
+                { text: "Oral contraceptives", correct: false },
+                { text: "Annual CA-125", correct: false },
+                { text: "Ultrasound every 6 months", correct: false },
+                { text: "Hysterectomy", correct: false },
+            ]
+        },
+        {
+            question: "A woman with recurrent ovarian cancer 12 months after first remission. What is treatment?",
+            answers: [
+                { text: "Platinum-based chemotherapy", correct: true },
+                { text: "Radiation", correct: false },
+                { text: "Surgery only", correct: false },
+                { text: "Hormonal therapy", correct: false },
+                { text: "Palliative care only", correct: false },
+            ]
+        },
+        {
+            question: "A postmenopausal woman with endometrial cancer and severe comorbidities. What is alternative to surgery?",
+            answers: [
+                { text: "Radiation therapy", correct: true },
+                { text: "Chemotherapy", correct: false },
+                { text: "Hormonal therapy", correct: false },
+                { text: "Immunotherapy", correct: false },
+                { text: "Active surveillance", correct: false },
+            ]
+        },
+        {
+            question: "Menorrhagia is:",
+            answers: [
+                { text: "Cyclic uterine bleeding", correct: true },
+                { text: "Acyclic Uterine Bleeding", correct: false },
+                { text: "Painful and heavy menstruation", correct: false },
+                { text: "Pre and postmenstrual bleeding", correct: false },
+                { text: "absense of menses", correct: false },
+            ]
+        },
+        {
+            question: "A 30-year-old with acute pelvic pain and fever. What is the most likely diagnosis?",
+            answers: [
+                { text: "PID", correct: true },
+                { text: "Ovarian cyst", correct: false },
+                { text: "Endometriosis", correct: false },
+                { text: "Dysmenorrhea", correct: false },
+                { text: "Irritable bowel", correct: false },
+            ]
+        },
+        {
+            question: "A woman with cyclic pelvic pain and dysmenorrhea. What is most likely?",
+            answers: [
+                { text: "Endometriosis", correct: true },
+                { text: "PID", correct: false },
+                { text: "Ovarian cancer", correct: false },
+                { text: "Uterine fibroids", correct: false },
+                { text: "Cystitis", correct: false },
+            ]
+        },
+        {
+            question: "A postmenopausal woman with vaginal bleeding. What must be ruled out first?",
+            answers: [
+                { text: "Endometrial cancer", correct: true },
+                { text: "Atrophic vaginitis", correct: false },
+                { text: "Cervical polyp", correct: false },
+                { text: "UTI", correct: false },
+                { text: "Hemorrhoids", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old with sudden severe unilateral pelvic pain. What is most likely?",
+            answers: [
+                { text: "Ovarian torsion", correct: true },
+                { text: "PID", correct: false },
+                { text: "Endometriosis", correct: false },
+                { text: "Dysmenorrhea", correct: false },
+                { text: "Appendicitis", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old with unilateral ovarian dermoid cyst. What is treatment?",
+            answers: [
+                { text: "Cystectomy", correct: true },
+                { text: "Oophorectomy", correct: false },
+                { text: "Chemotherapy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Observation", correct: false },
+            ]
+        },
+        {
+            question: "A 20-year-old with dysmenorrhea unresponsive to NSAIDs. What is next treatment?",
+            answers: [
+                { text: "Combined oral contraceptives", correct: true },
+                { text: "Hysterectomy", correct: false },
+                { text: "Antibiotics", correct: false },
+                { text: "Chemotherapy", correct: false },
+                { text: "Radiation", correct: false },
+            ]
+        },
+        {
+            question: "A 35-year-old with chronic pelvic pain and dyspareunia. Laparoscopy shows endometriosis. What is first-line medical treatment?",
+            answers: [
+                { text: "Progestins or combined contraceptives", correct: true },
+                { text: "GnRH agonists", correct: false },
+                { text: "Danazol", correct: false },
+                { text: "Aromatase inhibitors", correct: false },
+                { text: "Hysterectomy", correct: false },
+            ]
+        },
+        {
+            question: "A 40-year-old with abnormal uterine bleeding and anemia. Ultrasound shows endometrial thickness 18mm. What is next?",
+            answers: [
+                { text: "Endometrial biopsy", correct: true },
+                { text: "Hormonal therapy", correct: false },
+                { text: "Hysterectomy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Iron supplements", correct: false },
+            ]
+        },
+        {
+            question: "A 45-year-old with heavy bleeding, enlarged uterus, and iron deficiency anemia. What is definitive treatment?",
+            answers: [
+                { text: "Hysterectomy", correct: true },
+                { text: "Medical management", correct: false },
+                { text: "Iron therapy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Uterine artery embolization", correct: false },
+            ]
+        },
+        {
+            question: "A 32-year-old with stage IV endometriosis and severe pain failed medical therapy. What is next?",
+            answers: [
+                { text: "Surgical excision", correct: true },
+                { text: "Additional medical therapy", correct: false },
+                { text: "Hysterectomy", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Chemotherapy", correct: false },
+            ]
+        },
+        {
+            question: "A 60-year-old with pelvic mass, CA-125 500, and pleural effusion. What is most likely?",
+            answers: [
+                { text: "Ovarian cancer", correct: true },
+                { text: "Uterine fibroids", correct: false },
+                { text: "Benign cyst", correct: false },
+                { text: "Endometriosis", correct: false },
+                { text: "Tuberculosis", correct: false },
+            ]
+        },
+        {
+            question: "A 25-year-old with acute PID. What is the antibiotic regimen?",
+            answers: [
+                { text: "Ceftriaxone + doxycycline + metronidazole", correct: true },
+                { text: "Penicillin alone", correct: false },
+                { text: "Ciprofloxacin", correct: false },
+                { text: "Azithromycin", correct: false },
+                { text: "Vancomycin", correct: false },
+            ]
+        },
+        {
+            question: "A 55-year-old with postmenopausal bleeding. Endometrial biopsy shows hyperplasia with atypia. What is treatment?",
+            answers: [
+                { text: "Hysterectomy", correct: true },
+                { text: "Progestin therapy", correct: false },
+                { text: "Observation", correct: false },
+                { text: "Radiation", correct: false },
+                { text: "Chemotherapy", correct: false },
+            ]
+        },
+        {
+            question: "In family planning, what does the term 'fertility awareness' refer to?",
+            answers: [
+                { text: "Tracking ovulation and menstrual cycles", correct: true },
+                { text: "Using contraceptives", correct: false },
+                { text: "Surgical sterilization", correct: false },
+                { text: "Hormonal treatments", correct: false },
+                { text: "none of them", correct: false },
+            ]
+        },
+        ];
+
+        // Quiz state
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let isExamMode = false;
+        let isDarkMode = false;
+        let isAnswerMode = false;
+        let isQuestionShuffleMode = false; // NEW: Question shuffle mode for non-exam
+        let isQuestionShuffleEnabled = false; // NEW: Question shuffle for exam mode
+        let timerInterval = null;
+        let timerActive = false;
+        let timerExpired = false;
+        let totalQuestions = questions.length;
+        let selectedQuestionCount = questions.length;
+        let examGridExpanded = true;
+        let originalQuestionOrder = []; // NEW: Store original question order
+        let shuffledQuestionOrder = []; // NEW: Store shuffled question order
+        let currentQuestionOrder = []; // NEW: Current active question order
+
+        // NEW: Shuffle array function
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // NEW: Shuffle options for a question
+        function shuffleQuestionOptions(question) {
+            const shuffledAnswers = shuffleArray(question.answers);
+            return {
+                ...question,
+                answers: shuffledAnswers
+            };
+        }
+
+        // Initialize quiz
+        function initializeQuiz() {
+            // Initialize question orders
+            originalQuestionOrder = Array.from({length: questions.length}, (_, i) => i);
+            shuffledQuestionOrder = shuffleArray(originalQuestionOrder);
+            currentQuestionOrder = [...originalQuestionOrder];
+            
+            userAnswers = new Array(questions.length).fill(null);
+            loadQuestion();
+            createQuestionGrid();
+            createMobileQuestionGrid();
+            createExamQuestionGrid();
+            updateNavigationButtons();
+        }
+
+        // Load current question with option shuffling
+        function loadQuestion() {
+            const questionIndex = currentQuestionOrder[currentQuestionIndex];
+            const originalQuestion = questions[questionIndex];
+            
+            // NEW: Always shuffle options when loading a question
+            const question = shuffleQuestionOptions(originalQuestion);
+            
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestionIndex + 1}`;
+            document.getElementById('questionCounter').textContent = `${currentQuestionIndex + 1} / ${selectedQuestionCount}`;
+            document.getElementById('questionText').textContent = question.question;
+
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+
+            question.answers.forEach((answer, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option';
+                answerDiv.onclick = () => selectAnswer(index, answer.correct);
+
+                const optionLabel = document.createElement('div');
+                optionLabel.className = 'option-label';
+                optionLabel.textContent = String.fromCharCode(65 + index); // A, B, C, D
+
+                const optionText = document.createElement('div');
+                optionText.className = 'option-text';
+                optionText.textContent = answer.text;
+
+                answerDiv.appendChild(optionLabel);
+                answerDiv.appendChild(optionText);
+                answersContainer.appendChild(answerDiv);
+
+                // Restore previous selection
+                if (userAnswers[questionIndex] !== null && userAnswers[questionIndex].selectedIndex === index) {
+                    answerDiv.classList.add('selected');
+                }
+
+                // Apply answer mode styling if active and not in exam mode
+                if (isAnswerMode && !isExamMode) {
+                    if (answer.correct) {
+                        answerDiv.classList.add('correct-answer-mode');
+                    } else {
+                        answerDiv.classList.add('other-answer-mode');
+                    }
+                }
+
+                // Apply timer expired styling
+                if (timerExpired) {
+                    answerDiv.classList.add('timer-expired');
+                }
+            });
+
+            updateQuestionGrid();
+            updateMobileQuestionGrid();
+            updateExamQuestionGrid();
+        }
+
+        // Select answer with correct answer tracking
+        function selectAnswer(answerIndex, isCorrect) {
+            if (timerExpired) return;
+
+            const questionIndex = currentQuestionOrder[currentQuestionIndex];
+            const answerOptions = document.querySelectorAll('.answer-option');
+            
+            // In exam mode, ensure only one option can be selected (radio button behavior)
+            if (isExamMode) {
+                answerOptions.forEach(option => option.classList.remove('selected'));
+            }
+
+            // Store the answer with correctness info
+            userAnswers[questionIndex] = {
+                selectedIndex: answerIndex,
+                isCorrect: isCorrect
+            };
+
+            // Update visual selection
+            answerOptions[answerIndex].classList.add('selected');
+
+            // In non-exam mode, show immediate feedback
+            if (!isExamMode) {
+                const originalQuestion = questions[questionIndex];
+                answerOptions.forEach((option, index) => {
+                    option.classList.remove('correct', 'incorrect');
+                    // Find the correct answer in the shuffled options
+                    const currentAnswers = Array.from(document.querySelectorAll('.option-text')).map(el => el.textContent);
+                    const correctAnswerText = originalQuestion.answers.find(a => a.correct).text;
+                    const correctIndex = currentAnswers.indexOf(correctAnswerText);
+                    
+                    if (index === correctIndex) {
+                        option.classList.add('correct');
+                    } else if (index === answerIndex) {
+                        option.classList.add('incorrect');
+                    }
+                    option.classList.add('disabled');
+                });
+            }
+
+            updateQuestionGrid();
+            updateMobileQuestionGrid();
+            updateExamQuestionGrid();
+            updateNavigationButtons();
+        }
+
+        // Navigation functions
+        function nextQuestion() {
+            if (currentQuestionIndex < selectedQuestionCount - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+                updateNavigationButtons();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+                updateNavigationButtons();
+            }
+        }
+
+        function jumpToQuestion(questionIndex) {
+            if (questionIndex < selectedQuestionCount) {
+                currentQuestionIndex = questionIndex;
+                loadQuestion();
+                updateNavigationButtons();
+            }
+        }
+
+        function jumpToQuestionNumber() {
+            const input = document.getElementById('jumpInput');
+            const questionNumber = parseInt(input.value);
+            
+            if (questionNumber >= 1 && questionNumber <= selectedQuestionCount) {
+                jumpToQuestion(questionNumber - 1);
+                input.value = '';
+            } else {
+                alert(`Please enter a number between 1 and ${selectedQuestionCount}`);
+            }
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === selectedQuestionCount - 1) {
+                nextBtn.style.display = 'none';
+                if (isExamMode) {
+                    submitBtn.style.display = 'inline-block';
+                    finishBtn.style.display = 'none';
+                } else {
+                    finishBtn.style.display = 'inline-block';
+                    submitBtn.style.display = 'none';
+                }
+            } else {
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+                submitBtn.style.display = 'none';
+            }
+
+            // Show submit button in exam mode for instant results
+            if (isExamMode && currentQuestionIndex < selectedQuestionCount - 1) {
+                submitBtn.style.display = 'inline-block';
+            }
+        }
+
+        // Question grid functions
+        function createQuestionGrid() {
+            const grid = document.getElementById('questionGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < selectedQuestionCount; i++) {
+                const gridItem = document.createElement('div');
+                gridItem.className = 'grid-item';
+                gridItem.textContent = i + 1;
+                gridItem.onclick = () => jumpToQuestion(i);
+                grid.appendChild(gridItem);
+            }
+        }
+
+        function createMobileQuestionGrid() {
+            const grid = document.getElementById('mobileQuestionGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < selectedQuestionCount; i++) {
+                const gridItem = document.createElement('div');
+                gridItem.className = 'grid-item';
+                gridItem.textContent = i + 1;
+                gridItem.onclick = () => jumpToQuestion(i);
+                grid.appendChild(gridItem);
+            }
+        }
+
+        function createExamQuestionGrid() {
+            const grid = document.getElementById('examGridContainer');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < selectedQuestionCount; i++) {
+                const gridItem = document.createElement('div');
+                gridItem.className = 'exam-grid-item';
+                gridItem.textContent = i + 1;
+                gridItem.onclick = () => jumpToQuestion(i);
+                grid.appendChild(gridItem);
+            }
+        }
+
+        function updateQuestionGrid() {
+            const gridItems = document.querySelectorAll('#questionGrid .grid-item');
+            gridItems.forEach((item, index) => {
+                item.classList.remove('current', 'answered', 'unanswered', 'correct', 'incorrect');
+                
+                const questionIndex = currentQuestionOrder[index];
+                if (index === currentQuestionIndex) {
+                    item.classList.add('current');
+                } else if (userAnswers[questionIndex] !== null) {
+                    if (isExamMode) {
+                        item.classList.add('answered');
+                    } else {
+                        // NEW: Check correctness for normal mode
+                        if (userAnswers[questionIndex].isCorrect) {
+                            item.classList.add('correct');
+                        } else {
+                            item.classList.add('incorrect');
+                        }
+                    }
+                } else {
+                    item.classList.add('unanswered');
+                }
+            });
+        }
+
+        function updateMobileQuestionGrid() {
+            const gridItems = document.querySelectorAll('#mobileQuestionGrid .grid-item');
+            gridItems.forEach((item, index) => {
+                item.classList.remove('current', 'answered', 'unanswered', 'correct', 'incorrect');
+                
+                const questionIndex = currentQuestionOrder[index];
+                if (index === currentQuestionIndex) {
+                    item.classList.add('current');
+                } else if (userAnswers[questionIndex] !== null) {
+                    if (isExamMode) {
+                        item.classList.add('answered');
+                    } else {
+                        // NEW: Check correctness for normal mode
+                        if (userAnswers[questionIndex].isCorrect) {
+                            item.classList.add('correct');
+                        } else {
+                            item.classList.add('incorrect');
+                        }
+                    }
+                } else {
+                    item.classList.add('unanswered');
+                }
+            });
+        }
+
+        function updateExamQuestionGrid() {
+            const gridItems = document.querySelectorAll('#examGridContainer .exam-grid-item');
+            gridItems.forEach((item, index) => {
+                item.classList.remove('current', 'answered', 'unanswered');
+                
+                const questionIndex = currentQuestionOrder[index];
+                if (index === currentQuestionIndex) {
+                    item.classList.add('current');
+                } else if (userAnswers[questionIndex] !== null) {
+                    item.classList.add('answered');
+                } else {
+                    item.classList.add('unanswered');
+                }
+            });
+        }
+
+        // Mobile dropdown functions
+        function toggleMobileDropdown() {
+            const content = document.getElementById('dropdownContent');
+            const arrow = document.getElementById('dropdownArrow');
+            
+            content.classList.toggle('expanded');
+            arrow.classList.toggle('expanded');
+        }
+
+        // Exam grid toggle functions
+        function toggleExamGrid() {
+            const container = document.getElementById('examGridContainer');
+            const toggle = document.getElementById('examGridToggle');
+            
+            examGridExpanded = !examGridExpanded;
+            
+            if (examGridExpanded) {
+                container.classList.remove('collapsed');
+                toggle.textContent = 'Collapse';
+            } else {
+                container.classList.add('collapsed');
+                toggle.textContent = 'Expand';
+            }
+        }
+
+        // Mode toggle functions
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            const btn = document.getElementById('darkModeBtn');
+            
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                btn.classList.add('active');
+                btn.textContent = '☀️ Light Mode';
+            } else {
+                document.body.classList.remove('dark-mode');
+                btn.classList.remove('active');
+                btn.textContent = '🌙 Dark Mode';
+            }
+        }
+
+        function toggleAnswerMode() {
+            isAnswerMode = !isAnswerMode;
+            const btn = document.getElementById('answerModeBtn');
+            
+            if (isAnswerMode) {
+                btn.classList.add('active');
+                btn.textContent = '🔒 Hide Answers';
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '💡 Answer Mode';
+            }
+            
+            loadQuestion(); // Reload to apply answer mode styling
+        }
+
+        // NEW: Question shuffle mode for non-exam mode
+        function toggleQuestionShuffleMode() {
+            isQuestionShuffleMode = !isQuestionShuffleMode;
+            const btn = document.getElementById('questionShuffleModeBtn');
+            
+            if (isQuestionShuffleMode) {
+                btn.classList.add('active');
+                btn.textContent = '🔀 Shuffle: ON';
+                currentQuestionOrder = [...shuffledQuestionOrder];
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '🔀 Shuffle Questions';
+                currentQuestionOrder = [...originalQuestionOrder];
+            }
+            
+            // Reset to first question and reload
+            currentQuestionIndex = 0;
+            loadQuestion();
+            createQuestionGrid();
+            createMobileQuestionGrid();
+            updateNavigationButtons();
+        }
+
+        // NEW: Question shuffle toggle for exam mode
+        function toggleQuestionShuffle() {
+            isQuestionShuffleEnabled = !isQuestionShuffleEnabled;
+            const btn = document.getElementById('shuffleToggleBtn');
+            const settings = document.querySelector('.question-shuffle-settings');
+            const display = document.getElementById('questionShuffleDisplay');
+            const displayText = document.getElementById('shuffleDisplayText');
+            const resetBtn = document.getElementById('shuffleResetBtn');
+            
+            if (isQuestionShuffleEnabled) {
+                btn.classList.add('active');
+                btn.textContent = 'Enabled';
+                settings.classList.add('hidden');
+                display.classList.add('active');
+                displayText.textContent = 'Shuffle: ON';
+                resetBtn.classList.add('visible');
+                
+                // Apply shuffle
+                currentQuestionOrder = [...shuffledQuestionOrder];
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = 'Enable';
+                settings.classList.remove('hidden');
+                display.classList.remove('active');
+                displayText.textContent = 'Shuffle: Off';
+                resetBtn.classList.remove('visible');
+                
+                // Restore original order
+                currentQuestionOrder = [...originalQuestionOrder];
+            }
+            
+            // Reset to first question and reload
+            currentQuestionIndex = 0;
+            loadQuestion();
+            createExamQuestionGrid();
+            updateNavigationButtons();
+        }
+
+        // NEW: Reset question shuffle
+        function resetQuestionShuffle() {
+            isQuestionShuffleEnabled = false;
+            const btn = document.getElementById('shuffleToggleBtn');
+            const settings = document.querySelector('.question-shuffle-settings');
+            const display = document.getElementById('questionShuffleDisplay');
+            const displayText = document.getElementById('shuffleDisplayText');
+            const resetBtn = document.getElementById('shuffleResetBtn');
+            
+            btn.classList.remove('active');
+            btn.textContent = 'Enable';
+            settings.classList.remove('hidden');
+            display.classList.remove('active');
+            displayText.textContent = 'Shuffle: Off';
+            resetBtn.classList.remove('visible');
+            
+            // Restore original order
+            currentQuestionOrder = [...originalQuestionOrder];
+            currentQuestionIndex = 0;
+            loadQuestion();
+            createExamQuestionGrid();
+            updateNavigationButtons();
+        }
+
+        function toggleExamMode() {
+            isExamMode = !isExamMode;
+            const btn = document.getElementById('examModeBtn');
+            const exitBtn = document.getElementById('exitBtnText');
+            const title = document.querySelector('.title');
+            
+            if (isExamMode) {
+                document.body.classList.add('exam-mode');
+                btn.classList.add('active');
+                btn.textContent = '📝 Exit Exam Mode';
+                exitBtn.textContent = 'Exit Exam Mode';
+                title.textContent = 'EXAM MODE';
+                
+                // Reset all answers and reload
+                userAnswers = new Array(questions.length).fill(null);
+                currentQuestionIndex = 0;
+                loadQuestion();
+                updateNavigationButtons();
+            } else {
+                document.body.classList.remove('exam-mode');
+                btn.classList.remove('active');
+                btn.textContent = '🎓 Simulate Exam Mode';
+                exitBtn.textContent = 'Exit';
+                title.textContent = 'Enhanced Quiz Application';
+                
+                loadQuestion(); // Reload to remove exam mode styling
+            }
+        }
+
+        // NEW: Enhanced question count functions
+        function setQuestionCount() {
+            const input = document.getElementById('questionCountInput');
+            const newCount = parseInt(input.value) || questions.length;
+            
+            if (newCount < 1 || newCount > questions.length) {
+                alert(`Please enter a number between 1 and ${questions.length}`);
+                input.value = selectedQuestionCount;
+                return;
+            }
+            
+            selectedQuestionCount = newCount;
+            
+            // Hide settings and show display
+            const settings = document.querySelector('.question-count-settings');
+            const display = document.getElementById('questionCountDisplay');
+            const displayText = document.getElementById('countDisplayText');
+            const resetBtn = document.getElementById('countResetDisplayBtn');
+            
+            settings.classList.add('hidden');
+            displayText.textContent = `${selectedQuestionCount} / ${questions.length}`;
+            resetBtn.classList.add('visible');
+            
+            // Reset quiz state
+            userAnswers = new Array(questions.length).fill(null);
+            currentQuestionIndex = 0;
+            
+            // Update UI
+            document.getElementById('questionCounter').textContent = `1 / ${selectedQuestionCount}`;
+            document.getElementById('jumpInput').max = selectedQuestionCount;
+            createQuestionGrid();
+            createMobileQuestionGrid();
+            createExamQuestionGrid();
+            loadQuestion();
+            updateNavigationButtons();
+        }
+
+        // NEW: Reset question count
+        function resetQuestionCount() {
+            selectedQuestionCount = questions.length;
+            
+            // Show settings and hide display
+            const settings = document.querySelector('.question-count-settings');
+            const display = document.getElementById('questionCountDisplay');
+            const displayText = document.getElementById('countDisplayText');
+            const resetBtn = document.getElementById('countResetDisplayBtn');
+            const input = document.getElementById('questionCountInput');
+            
+            settings.classList.remove('hidden');
+            displayText.textContent = `${questions.length} / ${questions.length}`;
+            resetBtn.classList.remove('visible');
+            input.value = questions.length;
+            
+            // Reset quiz state
+            userAnswers = new Array(questions.length).fill(null);
+            currentQuestionIndex = 0;
+            
+            // Update UI
+            document.getElementById('questionCounter').textContent = `1 / ${selectedQuestionCount}`;
+            document.getElementById('jumpInput').max = selectedQuestionCount;
+            createQuestionGrid();
+            createMobileQuestionGrid();
+            createExamQuestionGrid();
+            loadQuestion();
+            updateNavigationButtons();
+        }
+
+        // Timer functions
+        function startTimer() {
+            const minutes = parseInt(document.getElementById('minutesInput').value) || 0;
+            const seconds = parseInt(document.getElementById('secondsInput').value) || 0;
+            const totalSeconds = minutes * 60 + seconds;
+
+            if (totalSeconds <= 0) {
+                alert('Please set a valid time');
+                return;
+            }
+
+            timerActive = true;
+            timerExpired = false;
+            let remainingTime = totalSeconds;
+
+            const timer = document.getElementById('timer');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerResetBtn = document.getElementById('timerResetBtn');
+            const timerSettings = document.querySelector('.timer-settings');
+
+            timer.classList.add('active');
+            timerResetBtn.classList.add('visible');
+            timerSettings.classList.add('hidden');
+
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    timerExpired = true;
+                    timerActive = false;
+                    timer.classList.remove('active');
+                    timerDisplay.textContent = 'Time expired!';
+                    
+                    // Show timer expired overlay
+                    document.getElementById('timerExpiredOverlay').classList.add('visible');
+                    document.getElementById('quizSection').classList.add('timer-expired');
+                    
+                    // Auto-submit quiz
+                    setTimeout(() => {
+                        finishQuiz();
+                    }, 3000);
+                }
+
+                remainingTime--;
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerActive = false;
+            timerExpired = false;
+
+            const timer = document.getElementById('timer');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerResetBtn = document.getElementById('timerResetBtn');
+            const timerSettings = document.querySelector('.timer-settings');
+
+            timer.classList.remove('active');
+            timerResetBtn.classList.remove('visible');
+            timerSettings.classList.remove('hidden');
+            timerDisplay.textContent = 'No timer set';
+
+            document.getElementById('timerExpiredOverlay').classList.remove('visible');
+            document.getElementById('quizSection').classList.remove('timer-expired');
+
+            loadQuestion(); // Reload to remove timer expired styling
+        }
+
+        function hideTimerExpiredOverlay() {
+            document.getElementById('timerExpiredOverlay').classList.remove('visible');
+        }
+
+        // Quiz completion
+        function finishQuiz() {
+            const answeredQuestions = userAnswers.slice(0, selectedQuestionCount).filter(answer => answer !== null).length;
+            const correctAnswers = userAnswers.slice(0, selectedQuestionCount).reduce((count, answer, index) => {
+                if (answer !== null && answer.isCorrect) {
+                    return count + 1;
+                }
+                return count;
+            }, 0);
+
+            const percentage = Math.round((correctAnswers / selectedQuestionCount) * 100);
+            const passed = percentage >= 60;
+
+            if (isExamMode) {
+                // Show result overlay for exam mode
+                const resultOverlay = document.getElementById('resultOverlay');
+                const resultMessage = document.getElementById('resultMessage');
+                const resultTitle = document.getElementById('resultTitle');
+                const resultStats = document.getElementById('resultStats');
+
+                resultTitle.textContent = passed ? '🎉 PASSED!' : '❌ FAILED';
+                resultTitle.className = `result-title ${passed ? 'passed' : 'failed'}`;
+                resultMessage.className = `result-message ${passed ? 'passed' : 'failed'}`;
+
+                resultStats.innerHTML = `
+                    <strong>Questions Answered:</strong> ${answeredQuestions} / ${selectedQuestionCount}<br>
+                    <strong>Correct Answers:</strong> ${correctAnswers} / ${selectedQuestionCount}<br>
+                    <strong>Percentage:</strong> ${percentage}%<br><br>
+                    <em>${passed ? 'Congratulations! You passed the exam.' : 'You need 60% to pass. Better luck next time!'}</em>
+                `;
+
+                resultOverlay.classList.add('visible');
+            } else {
+                // Show alert for normal mode
+                let message = `Quiz Completed!\n\n`;
+                message += `Questions Answered: ${answeredQuestions} / ${selectedQuestionCount}\n`;
+                message += `Correct Answers: ${correctAnswers} / ${selectedQuestionCount}\n`;
+                message += `Percentage: ${percentage}%`;
+
+                alert(message);
+            }
+        }
+
+        function hideResultOverlay() {
+            document.getElementById('resultOverlay').classList.remove('visible');
+        }
+
+        function exitQuiz() {
+            if (isExamMode) {
+                toggleExamMode();
+            } else {
+                if (confirm('Are you sure you want to exit the quiz?')) {
+                    window.close();
+                }
+            }
+        }
+
+        // Initialize the quiz when page loads
+        document.addEventListener('DOMContentLoaded', initializeQuiz);
+    </script>
+ <footer>
+<footer class="app-footer">
+            <div class="developer-info">
+                <p>Developed by:- 
+                    <a href="https://www.instagram.com/mayyyank" class="ig-link" target="_blank">
+                        IG Handle (for queries)
+                    </a>
+                </p>
+            </div>
+            
+            <p class="disclaimer">
+                DISCLAIMER: The following questions are sourced from the question bank and are provided for your reference. Please note that this website holds no official affiliation with the university, and I cannot guarantee the absolute accuracy of the content. Wishing you the very best in your academic journey! 😊
+            </p>
+        </footer>
+
+        <style>
+            .app-footer {
+                background: var(--card-bg);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-radius: var(--radius);
+                padding: 24px;
+                box-shadow: var(--shadow);
+                border: 1px solid rgba(255,255,255,0.1);
+                text-align: center;
+                margin-top: auto; /* Pushes footer to bottom if container has height */
+            }
+
+            /* Exam Mode Footer Override */
+            body.exam-mode .app-footer {
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                border-top: 1px solid var(--border-color);
+                border-radius: 0;
+            }
+
+            .developer-info {
+                font-weight: 600;
+                margin-bottom: 12px;
+                font-size: 1rem;
+                color: var(--text-main);
+            }
+
+            .ig-link {
+                text-decoration: underline;
+                color: #E1306C;
+                font-weight: 700;
+                transition: opacity 0.2s;
+            }
+            
+            .ig-link:hover {
+                opacity: 0.8;
+            }
+
+            .disclaimer {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                line-height: 1.6;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            /* Mobile adjustment */
+            @media (max-width: 768px) {
+                .app-footer {
+                    padding: 20px 15px;
+                }
+                .disclaimer {
+                    font-size: 0.75rem;
+                }
+            }
+        </style>
+</footer>
+</body>
+</html>
